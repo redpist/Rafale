@@ -55,6 +55,15 @@ namespace Rafale
 
       // --------------------------
 
+
+      template <int N>
+      struct EnumToType
+      {
+        typedef String Type;
+      };
+
+      // --------------------------
+
       union BasicData
       {
         String          *string;
@@ -64,12 +73,6 @@ namespace Rafale
       };
 
       // --------------------------
-
-      template <int N>
-      struct EnumToType
-      {
-        typedef String Type;
-      };
 
       template <typename T>
       struct Assign
@@ -106,7 +109,6 @@ namespace Rafale
           data_.dateTime = new DateTime(dateTime);
         }
       };
-
     }
 
     class Data
@@ -139,6 +141,7 @@ namespace Rafale
       {
         return type_;
       }
+
     private:
       template <typename T>
       void      SetData_(T data)
@@ -146,7 +149,7 @@ namespace Rafale
         Internal_::Assign<T>(data_, data);
       }
 
-      SQL::Type type_;
+      const SQL::Type type_;
       Internal_::BasicData      data_;
     };
   }
