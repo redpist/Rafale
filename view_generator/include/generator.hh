@@ -16,7 +16,7 @@ public:
     std::ifstream viewFile(fileName);
 
     if (!viewFile.is_open())
-      throw("no view file");
+      throw ("no view file");
 
     std::cout << "void View::Print()\n{\n";
 
@@ -61,14 +61,13 @@ public:
 private:
   void  PrintHtml(const std::string& buffer)
   {
-    std::cout << "std::cout << \"" << EscapeSpecialChar(buffer) << "\" << \\n;\n";
+    std::cout << "std::cout << \"" << EscapeSpecialChar(buffer) << "\" << \"\\n\";\n";
   }
 
   void  PrintCPlusPlus(const std::string& buffer)
   {
     std::cout << buffer;
   }
-
 
   inline std::string EscapeSpecialChar(const std::string& buffer)
   {
