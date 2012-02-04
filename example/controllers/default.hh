@@ -35,7 +35,6 @@ controller Default
 public:
   Default()
   {
-    std::cout << "Constructor" << std::endl;
   }
 
   view  main
@@ -47,6 +46,11 @@ public:
   {
     view.str = "view index =)";
   }
+
+  view  Test
+  {
+  };
+
 
   action Test()
   {
