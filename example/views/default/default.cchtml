@@ -12,6 +12,7 @@
 	<body>
         <c++>
           std::cout << "TEST" << std::endl;
+          std::cout << str << std::endl;
         </c++>
 	</body>
 </html>
