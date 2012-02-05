@@ -30,6 +30,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <list>
 
 class Generator
 {
@@ -64,6 +65,13 @@ public:
               {
                 lockController_ = true;
                 std::string tmp = Consume(end);
+                // Register(\"" + actionName_ + "\", &_Controller_" + controllerName_ + "::" + actionName_ + ");\n"
+                altBuffer_ += "_Controller_" + controllerName_ + "()\n{\n";
+                for (auto action: actions_)
+                  {
+                    altBuffer_ += "Register(\"" + action + "\", &_Controller_" + controllerName_ + "::" + action + ");\n";
+                  }
+                altBuffer_ += "}\n";
                 altBuffer_ += Consume();
                 Product(tmp);
                 ParseController();
@@ -276,7 +284,7 @@ private:
         if (nextOpeningBracket == std::string::npos)
           throw ("No Opening bracket after declaration of controller named \"" + controllerName_ + "\", line : " + "(TODO : PUT int to string call with line as parameter)" + ".");
         buffer = "class ";
-        buffer += "_Controller_" + controllerName_;
+        buffer += "_Controller_" + controllerName_ + " : public Rafale::Controller";
         Print(buffer);
         buffer = Consume(nextOpeningBracket);
         Print(buffer);
@@ -304,6 +312,7 @@ private:
         buffer.erase(0, offset + sizeof("action") - 1);
         Product(buffer);
         actionName_ = PopIdentifier();
+        actions_.push_back(actionName_);
         std::string line = Line();
         std::size_t   nextOpeningBracket = GetNextOpeningBracket();
         if (nextOpeningBracket == std::string::npos)
@@ -525,6 +534,8 @@ private:
 
   std::ifstream *viewFile_;
   std::size_t   line_;
+
+  std::list<std::string>        actions_;
 
   bool  newAction_;
   bool  newView_;

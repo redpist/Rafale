@@ -30,13 +30,11 @@
 #include <iostream>
 #include <string>
 
+#include "rafale.h"
+
 controller Default
 {
 public:
-  Default()
-  {
-  }
-
   view  main
   {
     std::string str;
@@ -47,14 +45,6 @@ public:
     view.str = "view index =)";
   }
 
-  view  Test
-  {
-  };
-
-
-  action Test()
-  {
-  }
 };
 
 #endif /* _DEFAULT_H_ */

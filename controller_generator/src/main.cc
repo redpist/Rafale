@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
   (void)argc;
   try
     {
-  generator.Generate(argv[1]);
+      generator.Generate(argv[1]);
     }
   catch (std::string s)
     {
