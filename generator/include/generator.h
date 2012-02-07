@@ -60,18 +60,56 @@ public:
     for (auto controller : controllers_)
       {
         std::cout << "controller : " << controller.first << std::endl;
+        // R0x::System::Directory      controllersDirectory();
         for (auto action : controller.second)
           {
-            std::cout << "action : " << action << std::endl;
+            viewGenerator_.Generate(controller.first, action,
+                                   path + "/views/" + controller.first + "/"
+                                   + action + ".cchtml",
+                                   path + "/generated/._view_" + controller.first
+                                   + "_" + action + ".cc");
+            std::cout << "+ action : " << action << std::endl;
           }
       }
-  }
+    std::ofstream mainFile(path + "/generated/.main.cc");
+    mainFile << "#include <map>\n#include <string>\n";
+    for (auto controller : controllers_)
+      {
+        mainFile << "#include \"._controller_" + controller.first + ".hh\"\n";
+        mainFile << "Rafale::Controller *Make"
+          + controller.first + "()\n"
+          "{\n"
+            "return new _Controller_" + controller.first + "();\n"
+          "}\n";
+
+      }
+    mainFile << "class Caller\n{\nprivate:\n";
+    mainFile << "static std::map<std::string, Rafale::Controller *(*)()> array;\n";
+    mainFile << "public :\n"
+      "static Rafale::Controller    *Make(const std::string &name)\n"
+      "{\n"
+      "return (Caller::array[name])();\n"
+      "}\n"
+      "};\n\n";
+    mainFile << "std::map<std::string, Rafale::Controller *(*)()> Caller::array = {\n";
+    for (auto controller : controllers_)
+      {
+        mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
+        // mainFile
+      }
+    mainFile << "};\n";
+    mainFile << "int main(int, char *argv[])\n"
+      "{\n"
+      "Rafale::Controller    *p = Caller::Make(argv[1]);\n"
+      "p->Action(argv[2]);\n"
+      "}\n";
+}
 
   ~Generator() { }
 private:
   std::map<std::string, std::list<std::string> >        controllers_;
   ControllerGenerator   controllerGenerator_;
-  ViewGenerator         ViewGenerator_;
+  ViewGenerator         viewGenerator_;
 };
 
 

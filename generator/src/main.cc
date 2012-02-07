@@ -6,6 +6,8 @@ int main(int argc, char *argv[])
 
   try
     {
+      if (argc != 2)
+        throw ("Usage: RafaleGenerator path\n");
       generator.Generate(argv[1]);
     }
   catch (std::string s)

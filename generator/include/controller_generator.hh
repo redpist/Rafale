@@ -134,7 +134,7 @@ public:
       {
         if (newView_)
           {
-            std::string s0 = Consume(GetNextOpeningBracket() + 1) + "\n~_View_" + controllerName_ + "_" + viewName_ + "()\n{\nPrint();\n}\nvoid Print();\n";
+            std::string s0 = Consume(GetNextOpeningBracket() + 1) + "\n~_View_" + viewName_ + "()\n{\nPrint();\n}\nvoid Print();\n";
             std::string s1 = Consume();
             Product(s0 + s1);
             newView_ = false;
@@ -288,10 +288,10 @@ private:
         Product(buffer);
         controllerName_ = PopIdentifier();
         // controllers_.push_back(controllerName_);
-        std::size_t line = line_;
+        std::string line = Line();
         std::size_t   nextOpeningBracket = GetNextOpeningBracket();
         if (nextOpeningBracket == std::string::npos)
-          throw ("No Opening bracket after declaration of controller named \"" + controllerName_ + "\", line : " + "(TODO : PUT int to string call with line as parameter)" + ".");
+          throw ("No Opening bracket after declaration of controller named \"" + controllerName_ + "\", line : " + line + ".");
         buffer = "class ";
         buffer += "_Controller_" + controllerName_ + " : public Rafale::Controller";
         Print(buffer);

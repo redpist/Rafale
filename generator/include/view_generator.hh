@@ -11,14 +11,21 @@ public:
   {
   }
 
-  void  Generate(const std::string &controllerName, const std::string &viewName, const std::string &fileName)
+  void  Generate(const std::string &controllerName, const std::string &viewName, const std::string &fileName, const std::string &outputFileName)
   {
     std::ifstream viewFile(fileName);
 
-    if (!viewFile.is_open())
-      throw ("no view file");
+   std::ofstream outputFile(outputFileName);
+   outputFile_ = &outputFile;
 
-    std::cout << ("void _Controller_" + controllerName + "::_View_" + viewName + "::Print()\n{\n");
+    if (!viewFile.is_open())
+      throw ("no view file : " + fileName);
+    if (!outputFile.is_open())
+      throw ("problem while opening : " + outputFileName);
+
+    outputFile << "#include \"._controller_" + controllerName + ".hh\"\n";
+
+    outputFile << ("void _Controller_" + controllerName + "::_View_" + viewName + "::Print()\n{\n");
 
     std::size_t offset;
     isInCPlusPlus_ = false;
@@ -32,7 +39,7 @@ public:
                 PrintHtml(buffer_.substr(0, offset));
                 isInCPlusPlus_ = true;
                 PrintCPlusPlus(buffer_.substr(offset + sizeof("<c++>") - 1, buffer_.size() - offset));
-                std::cout << "\n";
+                outputFile << "\n";
               }
             else
               PrintHtml(buffer_);
@@ -48,11 +55,11 @@ public:
             else
               {
                 PrintCPlusPlus(buffer_);
-                std::cout << "\n";
+                outputFile << "\n";
               }
           }
       }
-    std::cout << "std::cout << std::endl;\n}" << std::endl;
+    outputFile << "std::cout << std::flush;\n}" << std::endl;
   }
 
   ~ViewGenerator()
@@ -61,12 +68,12 @@ public:
 private:
   void  PrintHtml(const std::string& buffer)
   {
-    std::cout << "std::cout << \"" << EscapeSpecialChar(buffer) << "\" << \"\\n\";\n";
+    (*outputFile_) << "std::cout << \"" << EscapeSpecialChar(buffer) << "\" << \"\\n\";\n";
   }
 
   void  PrintCPlusPlus(const std::string& buffer)
   {
-    std::cout << buffer;
+    (*outputFile_) << buffer;
   }
 
   inline std::string EscapeSpecialChar(const std::string& buffer)
@@ -90,6 +97,7 @@ private:
     return result;
   }
 
+  std::ofstream *outputFile_;
   std::string   buffer_;
   bool          isInCPlusPlus_;
 };
