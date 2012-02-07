@@ -47,7 +47,6 @@ public:
       {
         if (file.Path() != "." && file.Path() != "..")
           {
-            std::cout << file.Path() << std::endl;
             controllerGenerator_.Generate(path + "/controllers/" + file.Path(),path + "/generated/._controller_" + file.Path() );
           }
       }

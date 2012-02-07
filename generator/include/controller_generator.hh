@@ -62,8 +62,9 @@ public:
     outputFile_ = &outputFile;
 
     if (!controllerFile_->is_open())
-      throw ("no controller file");
+      throw ("No controller file");
     Init();
+    Print("#include \"rafale.h\"\n");
     while (Product())
       {
         if (Controller())

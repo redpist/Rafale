@@ -38,11 +38,9 @@ public:
   {
     {
       std::size_t offset = url.find("http://");
-      std::cout << "offset : " << offset << std::endl;
       if (offset == 0)
         url = url.substr(sizeof("http://") - 1, url.size() - sizeof("http://") + 1);
     }
-    std::cout << "url : " << url << std::endl;
     std::size_t startController = url.find("/");
     if (startController == std::string::npos)
       {
@@ -75,8 +73,6 @@ public:
       controller_ = "Default";
     if (!action_.size())
       action_ = "Main";
-    std::cout << "controller : " << controller_ << std::endl;
-    std::cout << "action : " << action_ << std::endl;
   }
 
   const std::string &Controller()

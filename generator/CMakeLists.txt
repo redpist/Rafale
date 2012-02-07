@@ -1,7 +1,7 @@
 #set gcc version first
 SET(CMAKE_CXX_COMPILER g++-4.6)
 
-PROJECT(rafale)
+PROJECT(rafale_generator)
 
 cmake_minimum_required(VERSION 2.6)
 

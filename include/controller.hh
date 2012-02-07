@@ -27,6 +27,8 @@
 #ifndef _CONTROLLER_H_
 #define _CONTROLLER_H_
 
+#include <iostream>
+#include <string>
 #include <map>
 
 namespace Rafale
