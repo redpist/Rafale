@@ -18,8 +18,4 @@ a.out
 #no more object file
 *.o
 
-# QT
-qrc_*.cpp
-moc_*.cpp
-ui_*.h
-Makefile
+example/generated/*
