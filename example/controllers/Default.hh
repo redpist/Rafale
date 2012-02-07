@@ -35,12 +35,12 @@
 controller Default
 {
 public:
-  view  main
+  view  Main
   {
     std::string str;
   };
 
-  action main()
+  action Main()
   {
     view.str = "view index =)";
   }

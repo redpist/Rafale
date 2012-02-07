@@ -49,12 +49,6 @@ public:
           {
             std::cout << file.Path() << std::endl;
             controllerGenerator_.Generate(path + "/controllers/" + file.Path(),path + "/generated/._controller_" + file.Path() );
-  // std::ifstream *viewFile_;
-  //   std::ifstream viewFile(fileName);
-  //   viewFile_ = &viewFile;
-
-  //   if (!viewFile_->is_open())
-  //     throw ("no view file");
           }
       }
     for (auto controller : controllers_)
@@ -72,7 +66,7 @@ public:
           }
       }
     std::ofstream mainFile(path + "/generated/.main.cc");
-    mainFile << "#include <map>\n#include <string>\n";
+    mainFile << "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
     for (auto controller : controllers_)
       {
         mainFile << "#include \"._controller_" + controller.first + ".hh\"\n";
@@ -88,20 +82,28 @@ public:
     mainFile << "public :\n"
       "static Rafale::Controller    *Make(const std::string &name)\n"
       "{\n"
+      "if (Caller::array[name])"
       "return (Caller::array[name])();\n"
+      "else\n"
+      "throw(\"Controller Not Found.\");\n"
       "}\n"
       "};\n\n";
     mainFile << "std::map<std::string, Rafale::Controller *(*)()> Caller::array = {\n";
     for (auto controller : controllers_)
       {
         mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
-        // mainFile
       }
     mainFile << "};\n";
     mainFile << "int main(int, char *argv[])\n"
       "{\n"
-      "Rafale::Controller    *p = Caller::Make(argv[1]);\n"
-      "p->Action(argv[2]);\n"
+      "try\n{\n"
+      "Dispatcher dispatcher(argv[1]);\n"
+      "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
+      "p->Action(dispatcher.Action());\n"
+      "}\n"
+      "catch(const char*s) {\n"
+      "std::cerr << s << std::endl;"
+      "}\n"
       "}\n";
 }
 
