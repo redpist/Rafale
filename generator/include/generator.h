@@ -47,7 +47,7 @@ public:
       {
         if (file.Path() != "." && file.Path() != "..")
           {
-            controllerGenerator_.Generate(path + "/controllers/" + file.Path(),path + "/generated/._controller_" + file.Path() );
+            controllerGenerator_.Generate(path + "/controllers/" + file.Path(), path + "/generated/._controller_" + file.Path() );
           }
       }
     for (auto controller : controllers_)
@@ -56,6 +56,7 @@ public:
         // R0x::System::Directory      controllersDirectory();
         for (auto action : controller.second)
           {
+            files_[path + "/generated/._view_" + controller.first + "_" + action + ".cc"];
             viewGenerator_.Generate(controller.first, action,
                                    path + "/views/" + controller.first + "/"
                                    + action + ".cchtml",
@@ -64,51 +65,94 @@ public:
             std::cout << "+ action : " << action << std::endl;
           }
       }
-    std::ofstream mainFile(path + "/generated/.main.cc");
-    mainFile << "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
-    for (auto controller : controllers_)
-      {
-        mainFile << "#include \"._controller_" + controller.first + ".hh\"\n";
-        mainFile << "Rafale::Controller *Make"
-          + controller.first + "()\n"
-          "{\n"
+    {
+      files_[path + "/generated/.main.cc"];
+      std::ofstream mainFile(path + "/generated/.main.cc");
+      mainFile << "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
+      for (auto controller : controllers_)
+        {
+          mainFile << "#include \"._controller_" + controller.first + ".hh\"\n";
+          mainFile << "Rafale::Controller *Make"
+            + controller.first + "()\n"
+            "{\n"
             "return new _Controller_" + controller.first + "();\n"
-          "}\n";
+            "}\n";
 
-      }
-    mainFile << "class Caller\n{\nprivate:\n";
-    mainFile << "static std::map<std::string, Rafale::Controller *(*)()> array;\n";
-    mainFile << "public :\n"
-      "static Rafale::Controller    *Make(const std::string &name)\n"
-      "{\n"
-      "if (Caller::array[name])"
-      "return (Caller::array[name])();\n"
-      "else\n"
-      "throw(\"Controller Not Found.\");\n"
-      "}\n"
-      "};\n\n";
-    mainFile << "std::map<std::string, Rafale::Controller *(*)()> Caller::array = {\n";
-    for (auto controller : controllers_)
-      {
-        mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
-      }
-    mainFile << "};\n";
-    mainFile << "int main(int, char *argv[])\n"
-      "{\n"
-      "try\n{\n"
-      "Dispatcher dispatcher(argv[1]);\n"
-      "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
-      "p->Action(dispatcher.Action());\n"
-      "}\n"
-      "catch(const char*s) {\n"
-      "std::cerr << s << std::endl;"
-      "}\n"
-      "}\n";
+        }
+      mainFile << "class Caller\n{\nprivate:\n";
+      mainFile << "static std::map<std::string, Rafale::Controller *(*)()> array;\n";
+      mainFile << "public :\n"
+        "static Rafale::Controller    *Make(const std::string &name)\n"
+        "{\n"
+        "if (Caller::array[name])"
+        "return (Caller::array[name])();\n"
+        "else\n"
+        "throw(\"Controller Not Found.\");\n"
+        "}\n"
+        "};\n\n";
+      mainFile << "std::map<std::string, Rafale::Controller *(*)()> Caller::array = {\n";
+      for (auto controller : controllers_)
+        {
+          mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
+        }
+      mainFile << "};\n";
+      mainFile << "int main(int, char *argv[])\n"
+        "{\n"
+        "try\n{\n"
+        "Dispatcher dispatcher(argv[1]);\n"
+        "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
+        "p->Action(dispatcher.Action());\n"
+        "}\n"
+        "catch(const char*s) {\n"
+        "std::cerr << s << std::endl;"
+        "}\n"
+        "}\n";
+    }
+
+    {
+      std::ofstream makefile(path + "/Makefile");
+      makefile <<
+        "##############################################\n"
+        "# This is a Generated Makefile dont edit it. #\n"
+        "##############################################\n"
+        "\n"
+        "CXX							= g++-4.6\n"
+        "CXXFLAGS				= -std=c++0x -O3 -Wall -Wextra\n"
+        "INCPATH					= ~/dev/Rafale/include/\n"
+        "SOURCES					= ";
+        for (auto file: files_)
+          {
+            makefile << file.first << " ";
+          }
+      makefile << "\n"
+        "OBJ	=	$(SOURCES:.cc=.o)\n"
+        "NAME = public/index.fcgi\n"
+        "\n"
+        "all : $(OBJ)\n"
+        "	@$(CXX) $(OBJ) -o $(NAME)\n"
+        "	@echo 'Building target : ' $(NAME)\n"
+        "\n"
+        ".cc.o :\n"
+        "	@echo 'Building objet  : ' $@\n"
+        "	@$(CXX) $(CXXFLAGS) -I $(INCPATH) -c $< -o $@\n"
+        "\n"
+        "clean:\n"
+        "	$(RM) $(OBJ)\n"
+        "\n"
+        "fclean : clean\n"
+        "	$(RM) $(NAME)\n"
+        "\n"
+        "re: fclean all\n"
+        "\n"
+        ".PHONY: all clean fclean re\n";
+    }
 }
 
   ~Generator() { }
 private:
   std::map<std::string, std::list<std::string> >        controllers_;
+  struct        Null_ { };
+  std::map<std::string, Null_>                        files_;
   ControllerGenerator   controllerGenerator_;
   ViewGenerator         viewGenerator_;
 };

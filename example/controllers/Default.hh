@@ -11,12 +11,14 @@ public:
   view  Main
   {
     std::string str;
+    std::string lulz;
   };
 
   action Main()
   {
     view.str = "view index =)";
     view.str = view.str + "/view index =)";
+    view.lulz = "plimuk";
   }
 
   view  Test

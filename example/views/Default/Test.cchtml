@@ -19,7 +19,7 @@
           <c++>
             std::cout << element;
           </c++>
-          </li>
+         </li>
         <c++>
           }
         </c++>

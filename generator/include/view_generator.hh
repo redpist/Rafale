@@ -38,14 +38,15 @@ public:
               {
                 PrintHtml(buffer_.substr(0, offset));
                 isInCPlusPlus_ = true;
-                PrintCPlusPlus(buffer_.substr(offset + sizeof("<c++>") - 1, buffer_.size() - offset));
-                outputFile << "\n";
+                buffer_ = buffer_.substr(offset + sizeof("<c++>") - 1, buffer_.size() - offset);
+                goto inCplusplus;
               }
             else
               PrintHtml(buffer_);
           }
         else
           {
+inCplusplus:
             if ((offset = buffer_.find("</c++>")) != std::string::npos)
               {
                 PrintCPlusPlus(buffer_.substr(0, offset));

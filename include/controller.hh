@@ -43,7 +43,7 @@ namespace Rafale
     {
       void (Rafale::Controller::*actionPtr)(void);
 
-      if (actionPtr = Rafale::Controller::actions_[actionName])
+      if ((actionPtr = Rafale::Controller::actions_[actionName]))
         {
           (this->*actionPtr)();
         }
