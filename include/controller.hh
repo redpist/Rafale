@@ -27,9 +27,11 @@
 #ifndef _CONTROLLER_H_
 #define _CONTROLLER_H_
 
+#include <iterator>
 #include <iostream>
 #include <string>
 #include <map>
+#include <sstream>
 
 namespace Rafale
 {
@@ -39,24 +41,25 @@ namespace Rafale
     Controller() { }
     ~Controller() { }
 
-    void        Action(const std::string &actionName)
+    std::string        Action(const std::string &actionName)
     {
-      void (Rafale::Controller::*actionPtr)(void);
+      std::string (Rafale::Controller::*actionPtr)(void);
 
       if ((actionPtr = Rafale::Controller::actions_[actionName]))
         {
-          (this->*actionPtr)();
+          return (this->*actionPtr)();
         }
+      return "No Action.";
     }
 
   protected:
     template <class T>
-    void Register(const std::string &actionName, void (T::*actionPtr)(void))
+    void Register(const std::string &actionName, std::string (T::*actionPtr)(void))
     {
-      actions_[actionName] = static_cast<void (Rafale::Controller::*)(void)>(actionPtr);
+      actions_[actionName] = static_cast<std::string (Rafale::Controller::*)(void)>(actionPtr);
     }
 
-    std::map<std::string, void (Rafale::Controller::*)(void)>    actions_;
+    std::map<std::string, std::string (Rafale::Controller::*)(void)>    actions_;
 
   };
 }

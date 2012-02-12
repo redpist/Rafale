@@ -80,7 +80,11 @@ public:
                   {
                     altBuffer_ += "Register(\"" + action + "\", &_Controller_" + controllerName_ + "::" + action + ");\n";
                   }
-                altBuffer_ += "}\n";
+                altBuffer_ += "_saveCoutRdbuf_ = std::cout.rdbuf();\n"
+                  "std::cout.rdbuf(_outputBuffer_.rdbuf());\n"
+                  "}\n\nprivate :\n"
+                  "std::stringstream _outputBuffer_;\n"
+                  "std::streambuf *_saveCoutRdbuf_;\n";
                 altBuffer_ += Consume();
                 Product(tmp);
                 ParseController();
@@ -124,7 +128,10 @@ public:
         if ((end = ActionEnd()) != std::string::npos)
           {
             lockAction_ = true;
-            std::string tmp = Consume(end);
+            std::string tmp = Consume(end) + "view.Print();\n"
+              "std::cout.rdbuf(_saveCoutRdbuf_);"
+              "return _outputBuffer_.str();\n";
+            tmp += Consume(1);
             altBuffer_ += Consume();
             Product(tmp);
             lockAction_ = false;
@@ -135,7 +142,7 @@ public:
       {
         if (newView_)
           {
-            std::string s0 = Consume(GetNextOpeningBracket() + 1) + "\n~_View_" + viewName_ + "()\n{\nPrint();\n}\nvoid Print();\n";
+            std::string s0 = Consume(GetNextOpeningBracket() + 1) + "\nvoid Print();\n";
             std::string s1 = Consume();
             Product(s0 + s1);
             newView_ = false;
@@ -145,7 +152,7 @@ public:
         if ((end = ViewEnd()) != std::string::npos)
           {
             lockView_ = true;
-            std::string tmp = Consume(end);
+            std::string tmp = Consume(end + 1);
             altBuffer_ += Consume();
             Product(tmp);
             lockView_ = false;
@@ -240,16 +247,15 @@ private:
     std::size_t found = std::string::npos;
     while (i < buffer_.size())
       {
-        // std::cout << "[" << buffer_[i] << "]" << std::endl;
-        if (buffer_[i] == '}')
+            if (buffer_[i] == '}')
           --actionBrackets_;
         else if (buffer_[i] == '{')
             ++actionBrackets_;
         if ((found == std::string::npos) && !actionBrackets_)
-            found = i;
+          found = i;
         ++i;
       }
-    return found + 1;
+      return found;
   }
 
   std::size_t   ViewEnd()
@@ -258,7 +264,6 @@ private:
     std::size_t found = std::string::npos;
     while (i < buffer_.size())
       {
-        // std::cout << "[" << buffer_[i] << "]" << std::endl;
         if (buffer_[i] == '}')
           --viewBrackets_;
         else if (buffer_[i] == '{')
@@ -267,7 +272,7 @@ private:
             found = i;
         ++i;
       }
-    return found + 1;
+    return found;
   }
 
 
@@ -328,7 +333,7 @@ private:
         if (nextOpeningBracket == std::string::npos)
           throw ("No Opening bracket after declaration of action named \"" + actionName_ + "\", line : " + line + ".");
 
-        buffer = "void " + actionName_;
+        buffer = "std::string " + actionName_;
         Print(buffer);
         // buffer = Consume(nextOpeningBracket);
         actionBrackets_ = 1;

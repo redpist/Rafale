@@ -98,10 +98,12 @@ public:
       mainFile << "};\n";
       mainFile << "int main(int, char *argv[])\n"
         "{\n"
+        "std::cout << \"Content-type: text/html\\n\";\n"
         "try\n{\n"
         "Dispatcher dispatcher(argv[1]);\n"
+        "std::string s;"
         "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
-        "p->Action(dispatcher.Action());\n"
+        "std::cout << p->Action(dispatcher.Action());\n"
         "}\n"
         "catch(const char*s) {\n"
         "std::cerr << s << std::endl;"
@@ -126,7 +128,7 @@ public:
           }
       makefile << "\n"
         "OBJ	=	$(SOURCES:.cc=.o)\n"
-        "NAME = public/index.fcgi\n"
+        "NAME = public/index.cgi\n"
         "\n"
         "all : $(OBJ)\n"
         "	@$(CXX) $(OBJ) -o $(NAME)\n"
