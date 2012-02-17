@@ -39,7 +39,7 @@ namespace Rafale
   {
   public:
     Controller() { }
-    ~Controller() { }
+    virtual ~Controller() { }
 
     std::string        Action(const std::string &actionName)
     {

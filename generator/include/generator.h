@@ -131,6 +131,7 @@ public:
         "std::string s;"
         "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
         "std::cout << p->Action(dispatcher.Action());\n"
+        "delete p;\n"
         "}\n"
         "catch(const char*s) {\n"
         "std::cerr << s << std::endl;"
