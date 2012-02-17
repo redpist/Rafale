@@ -24,53 +24,20 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _R0X_SYSTEM_FILE_H_
-#define _R0X_SYSTEM_FILE_H_
+#ifndef _RAFALE_VIEW_H_
+#define _RAFALE_VIEW_H_
 
 #include <string>
-#include <sys/stat.h>
 
-namespace R0x
+namespace Rafale
 {
-  namespace System
+  struct View
   {
-    template <typename StringType>
-    class BasicFile
-    {
-    public:
-      BasicFile(const StringType &path) : path_(path) { }
-      ~BasicFile() { }
-      bool      IsRegularFile()
-      {
-        int status;
-        struct stat st_buf;
-
-        if (status)
-          throw ("stat error");
-        return S_ISREG(st_buf.st_mode);
-      }
-
-      const StringType &Path()
-      {
-        return path_;
-      }
-
-      StringType Extension()
-      {
-        return path_.substr(path_.rfind("."));
-      }
-
-      StringType ShortName()
-      {
-        return path_.substr(0, path_.rfind("."));
-      }
-
-    private:
-      StringType       path_;
-    };
-
-    typedef BasicFile<std::string>      File;
-  }
+  public:
+    View() { }
+    ~View() { }
+    virtual void   Print() = 0;
+  };
 }
 
-#endif /* _R0X_SYSTEM_FILE_H_ */
+#endif /* _RAFALE_VIEW_H_ */

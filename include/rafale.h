@@ -28,6 +28,7 @@
 #define _RAFALE_H_
 
 #include "controller.hh"
+#include "view.hh"
 
 
 #endif /* _RAFALE_H_ */

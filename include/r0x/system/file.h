@@ -55,6 +55,11 @@ namespace R0x
         return path_;
       }
 
+      StringType Extension()
+      {
+        return path_.substr(path_.rfind("."));
+      }
+
     private:
       StringType       path_;
     };

@@ -30,17 +30,44 @@
 #include <r0x/system/directory.h>
 #include "controller_generator.hh"
 #include "view_generator.hh"
+#include "layout_generator.hh"
 #include <list>
 
 class Generator
 {
 public:
-  Generator() : controllerGenerator_(controllers_)
+  Generator() : controllerGenerator_(controllers_, layouts_)
   {
   }
 
   void  Generate(const std::string &path)
   {
+    R0x::System::Directory      layoutsDirectory(path + "/layouts");
+    {
+      auto fileList = layoutsDirectory.List();
+      for (auto file: fileList)
+        {
+          if (file.Path() != "." && file.Path() != "..")
+          {
+            std::cout << "layout : " << file.ShortName() << std::endl;
+            layoutGenerator_.Generate(path + "/layouts/" + file.Path(), path + "/generated/._layout_" + file.ShortName() + ".hh", file.ShortName());
+            layouts_[file.ShortName()] = "._layout_" + file.ShortName() + ".hh";
+          }
+        }
+    }
+    {
+      std::ofstream layoutsHeaderFile(path + "/generated/._layouts.hh");
+      if (!layoutsHeaderFile.is_open())
+        throw ("problem while opening : " + path + "/generated/._layouts.hh");
+
+      layoutsHeaderFile << "#ifndef _LAYOUTS_H_\n";
+      layoutsHeaderFile << "# define _LAYOUTS_H_\n\n";
+      for (auto layout : layouts_)
+        {
+          layoutsHeaderFile << "#include \"" + layout.second + "\"\n";
+        }
+      layoutsHeaderFile << "#endif\n";
+    }
     R0x::System::Directory      controllersDirectory(path + "/controllers");
     auto fileList = controllersDirectory.List();
     for (auto file: fileList)
@@ -153,10 +180,12 @@ public:
   ~Generator() { }
 private:
   std::map<std::string, std::list<std::string> >        controllers_;
+  std::map<std::string, std::string>        layouts_;
   struct        Null_ { };
   std::map<std::string, Null_>                        files_;
   ControllerGenerator   controllerGenerator_;
   ViewGenerator         viewGenerator_;
+  LayoutGenerator         layoutGenerator_;
 };
 
 

@@ -36,7 +36,7 @@
 class ControllerGenerator
 {
 public:
-  ControllerGenerator(std::map<std::string, std::list<std::string> > &controllers) : controllers_(controllers)
+  ControllerGenerator(std::map<std::string, std::list<std::string> > &controllers, const std::map<std::string, std::string> &layouts) : controllers_(controllers), layouts_(layouts)
   {
   }
 
@@ -64,7 +64,8 @@ public:
     if (!controllerFile_->is_open())
       throw ("No controller file");
     Init();
-    Print("#include \"rafale.h\"\n");
+    Print("#include <rafale.h>\n");
+    Print("#include \"._layouts.hh\"\n");
     while (Product())
       {
         if (Controller())
@@ -80,11 +81,16 @@ public:
                   {
                     altBuffer_ += "Register(\"" + action + "\", &_Controller_" + controllerName_ + "::" + action + ");\n";
                   }
+                altBuffer_ += "layout_ = new Layout();\n";
                 altBuffer_ += "_saveCoutRdbuf_ = std::cout.rdbuf();\n"
                   "std::cout.rdbuf(_outputBuffer_.rdbuf());\n"
-                  "}\n\nprivate :\n"
+                  "}\n";
+                altBuffer_ += "~_Controller_" + controllerName_ + "()\n{\n"
+                  "delete layout_;\n}\n";
+                altBuffer_ += "\nprivate :\n"
                   "std::stringstream _outputBuffer_;\n"
-                  "std::streambuf *_saveCoutRdbuf_;\n";
+                  "std::streambuf *_saveCoutRdbuf_;\n"
+                  "Rafale::Layout       *layout_;\n";
                 altBuffer_ += Consume();
                 Product(tmp);
                 ParseController();
@@ -128,7 +134,7 @@ public:
         if ((end = ActionEnd()) != std::string::npos)
           {
             lockAction_ = true;
-            std::string tmp = Consume(end) + "view.Print();\n"
+            std::string tmp = Consume(end) + "layout_->Print(view);\n"
               "std::cout.rdbuf(_saveCoutRdbuf_);"
               "return _outputBuffer_.str();\n";
             tmp += Consume(1);
@@ -366,7 +372,7 @@ private:
         std::size_t   nextOpeningBracket = GetNextOpeningBracket();
         if (nextOpeningBracket == std::string::npos)
           throw ("No Opening bracket after declaration of view named \"" + viewName_ + "\", line : " + line + ".");
-        buffer = "struct _View_" + viewName_;
+        buffer = "struct _View_" + viewName_ + " : public Rafale::View";
         Print(buffer);
         // buffer = Consume(nextOpeningBracket);
         viewBrackets_ = 1;
@@ -377,7 +383,6 @@ private:
         return true;
       }
   }
-
 
   std::string   Line()
   {
@@ -554,6 +559,7 @@ private:
   std::list<std::string>        actions_;
 
   std::map<std::string, std::list<std::string> > &controllers_;
+  const std::map<std::string, std::string> &layouts_;
   bool  newAction_;
   bool  newView_;
 };
