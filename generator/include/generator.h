@@ -95,7 +95,9 @@ public:
     {
       files_[path + "/generated/.main.cc"];
       std::ofstream mainFile(path + "/generated/.main.cc");
-      mainFile << "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
+      mainFile << "#include \"fcgi_stdio.h\"\n"
+        "#include <cstdlib>\n"
+        "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
       for (auto controller : controllers_)
         {
           mainFile << "#include \"._controller_" + controller.first + ".hh\"\n";
@@ -123,19 +125,22 @@ public:
           mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
         }
       mainFile << "};\n";
-      mainFile << "int main(int, char *argv[])\n"
+      mainFile << "int main(void)\n"
         "{\n"
-        "std::cout << \"Content-type: text/html\\n\";\n"
-        "try\n{\n"
-        "Dispatcher dispatcher(argv[1]);\n"
-        "std::string s;"
-        "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
-        "std::cout << p->Action(dispatcher.Action());\n"
-        "delete p;\n"
-        "}\n"
-        "catch(const char*s) {\n"
-        "std::cerr << s << std::endl;"
-        "}\n"
+        "while(FCGI_Accept() >= 0)"
+        "{\n"
+         "try\n{\n"
+          "FCGI_printf(\"Content-type: text/html\\r\\n\\r\\n\");"
+          "Dispatcher dispatcher(getenv(\"SCRIPT_FILENAME\"));\n"
+          "std::string s;"
+          "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
+          "FCGI_printf(p->Action(dispatcher.Action()).c_str());\n"
+          "delete p;\n"
+         "}\n"
+         "catch(const char*s) {\n"
+          "std::cerr << s << std::endl;"
+          "}\n"
+         "}\n"
         "}\n";
     }
 
@@ -156,10 +161,10 @@ public:
           }
       makefile << "\n"
         "OBJ	=	$(SOURCES:.cc=.o)\n"
-        "NAME = public/index.cgi\n"
+        "NAME = public/index.fcgi\n"
         "\n"
         "all : $(OBJ)\n"
-        "	@$(CXX) $(OBJ) -o $(NAME)\n"
+        "	@$(CXX) $(OBJ) -l fcgi -o $(NAME)\n"
         "	@echo 'Building target : ' $(NAME)\n"
         "\n"
         ".cc.o :\n"
