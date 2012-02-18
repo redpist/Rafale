@@ -42,12 +42,30 @@ public:
 
   void  Generate(const std::string &path)
   {
+    // config
+    {
+      std::ifstream inputConfigFile(path + "/config.cc");
+      if (inputConfigFile.is_open())
+        {
+          std::string   configBuffer;
+          std::ofstream outputConfigFile(path + "/generated/.config.cc");
+          if (!outputConfigFile.is_open())
+            throw ("problem while opening : " + path + "/generated/.config.cc");
+          outputConfigFile << "#include \"config.hh\"\n";
+          while (!inputConfigFile.eof())
+            {
+              getline(inputConfigFile, configBuffer);
+              outputConfigFile << configBuffer + '\n';
+            }
+          files_[path + "/generated/.config.cc"];
+        }
+    }
     R0x::System::Directory      layoutsDirectory(path + "/layouts");
     {
       auto fileList = layoutsDirectory.List();
       for (auto file: fileList)
         {
-          if (file.Path() != "." && file.Path() != "..")
+          if (file.Path() != "." && file.Path() != ".." && file.Extension() == ".cchtml")
           {
             std::cout << "layout : " << file.ShortName() << std::endl;
             layoutGenerator_.Generate(path + "/layouts/" + file.Path(), path + "/generated/._layout_" + file.ShortName() + ".hh", file.ShortName());
@@ -72,7 +90,7 @@ public:
     auto fileList = controllersDirectory.List();
     for (auto file: fileList)
       {
-        if (file.Path() != "." && file.Path() != "..")
+        if (file.Path() != "." && file.Path() != ".." && file.Extension() == ".hh")
           {
             controllerGenerator_.Generate(path + "/controllers/" + file.Path(), path + "/generated/._controller_" + file.Path() );
           }
@@ -95,6 +113,16 @@ public:
     {
       files_[path + "/generated/.main.cc"];
       std::ofstream mainFile(path + "/generated/.main.cc");
+      mainFile << "#include <cppconn/driver.h>\n"
+        "#include <cppconn/exception.h>\n"
+        "#include <cppconn/warning.h>\n"
+        "#include <cppconn/metadata.h>\n"
+        "#include <cppconn/prepared_statement.h>\n"
+        "#include <cppconn/resultset.h>\n"
+        "#include <cppconn/resultset_metadata.h>\n"
+        "#include <cppconn/statement.h>\n"
+        "#include <mysql_driver.h>\n"
+        "#include <mysql_connection.h>\n";
       mainFile << "#include \"fcgi_stdio.h\"\n"
         "#include <cstdlib>\n"
         "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
@@ -106,7 +134,6 @@ public:
             "{\n"
             "return new _Controller_" + controller.first + "();\n"
             "}\n";
-
         }
       mainFile << "class Caller\n{\nprivate:\n";
       mainFile << "static std::map<std::string, Rafale::Controller *(*)()> array;\n";
@@ -134,7 +161,7 @@ public:
           "Dispatcher dispatcher(getenv(\"SCRIPT_FILENAME\"));\n"
           "std::string s;"
           "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
-          "FCGI_printf(p->Action(dispatcher.Action()).c_str());\n"
+          "FCGI_printf(\"%s\", p->Action(dispatcher.Action()).c_str());\n"
           "delete p;\n"
          "}\n"
          "catch(const char*s) {\n"

@@ -7,22 +7,28 @@ namespace Rafale
 {
   class Model
   {
-  public:
-    Model()
+  protected:
+    Model() : status_(deprecated)
     {
     }
 
-    virtual ~Model()
+    ~Model()
     {
     }
 
-    void        Insert(const  &t)
-    {
+    // void        Insert(const  &t)
+    // {
       
-    }
+    // }
   private:
-    sql::Driver                           *driver_;
-    sql::Connection                       con_;
+    // sql::Driver                           *driver_;
+    // sql::Connection                       con_;
+    enum Status
+      {
+        upToDate,
+        deprecated
+      };
+    Status        status_;
   };
 }
 

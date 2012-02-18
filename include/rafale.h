@@ -27,6 +27,7 @@
 #ifndef _RAFALE_H_
 #define _RAFALE_H_
 
+#include "model.hh"
 #include "controller.hh"
 #include "view.hh"
 

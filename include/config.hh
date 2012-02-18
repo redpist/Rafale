@@ -5,7 +5,7 @@
 
 namespace Rafale
 {
-  Config config;
+  extern Config config;
 }
 
 #endif /* _CONFIG_H_ */
