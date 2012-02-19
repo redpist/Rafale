@@ -20,7 +20,7 @@ namespace Rafale
 
   typedef std::vector<std::string>              Array;
   typedef std::string                           String;
-  typedef std::map<std::string, std::string> Config;
+  typedef std::map<std::string, std::string>    Config;
 }
 
 #endif /* _ABSTRACT_H_ */

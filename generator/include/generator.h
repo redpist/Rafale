@@ -113,18 +113,7 @@ public:
     {
       files_[path + "/generated/.main.cc"];
       std::ofstream mainFile(path + "/generated/.main.cc");
-      mainFile << "#include <cppconn/driver.h>\n"
-        "#include <cppconn/exception.h>\n"
-        "#include <cppconn/warning.h>\n"
-        "#include <cppconn/metadata.h>\n"
-        "#include <cppconn/prepared_statement.h>\n"
-        "#include <cppconn/resultset.h>\n"
-        "#include <cppconn/resultset_metadata.h>\n"
-        "#include <cppconn/statement.h>\n"
-        "#include <mysql_driver.h>\n"
-        "#include <mysql_connection.h>\n";
-      mainFile << "#include \"fcgi_stdio.h\"\n"
-        "#include <cstdlib>\n"
+      mainFile << "#include <cstdlib>\n"
         "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
       for (auto controller : controllers_)
         {
@@ -152,14 +141,14 @@ public:
           mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
         }
       mainFile << "};\n";
-      mainFile << "int main(void)\n"
+      mainFile << "#include \"fcgi_stdio.h\"\n"
+        "int main(void)\n"
         "{\n"
         "while(FCGI_Accept() >= 0)"
         "{\n"
          "try\n{\n"
           "FCGI_printf(\"Content-type: text/html\\r\\n\\r\\n\");"
           "Dispatcher dispatcher(getenv(\"SCRIPT_FILENAME\"));\n"
-          "std::string s;"
           "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
           "FCGI_printf(\"%s\", p->Action(dispatcher.Action()).c_str());\n"
           "delete p;\n"
