@@ -44,8 +44,8 @@ namespace Rafale
          //todo erreur no db.password section in config.cc
         }
 
-      con_ = std::auto_ptr<sql::Connection>(driver_->connect(host_, user_, password));
-      stmt_ = std::auto_ptr<sql::Statement>(con_->createStatement());
+      con_ = std::unique_ptr<sql::Connection>(driver_->connect(host_, user_, password));
+      stmt_ = std::unique_ptr<sql::Statement>(con_->createStatement());
 
       dataBase_ = Rafale::config["db.database"];
       if (!dataBase_.size())
@@ -57,7 +57,6 @@ namespace Rafale
 
     ~Model()
     {
-      stmt_.reset(NULL);
     }
 
   public:
@@ -105,7 +104,7 @@ namespace Rafale
         {
           for (auto autoIncrement : ChildModel::autoIncrements)
             {
-              ChildModel::datas_[autoIncrement].SetInt(static_cast<ChildModel*>(this), res->getInt(1));
+              ChildModel::datas_[autoIncrement].Set(static_cast<ChildModel*>(this), res->getInt(1));
             }
           // stmt_->execute(sql);
           return true;  // TODO RETURN SUCCESS OF INSERT
@@ -211,8 +210,8 @@ namespace Rafale
 
   private:
     sql::Driver                         *driver_;
-    std::auto_ptr<sql::Connection>    con_;
-    std::auto_ptr<sql::Statement>     stmt_;
+    std::shared_ptr<sql::Connection>    con_;
+    std::shared_ptr<sql::Statement>     stmt_;
   protected:
     std::string dataBase_;
     std::string host_;
