@@ -4,6 +4,7 @@
 #include "abstract.h"
 #include "config.hh"
 #include <string>
+#include <algorithm>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
@@ -15,7 +16,7 @@
 #include <mysql_driver.h>
 #include <mysql_connection.h>
 
-#define RafaleModel(X) X : public Rafale::Model<X>
+#include "sql.hh"
 
 namespace Rafale
 {
@@ -43,8 +44,8 @@ namespace Rafale
          //todo erreur no db.password section in config.cc
         }
 
-      con_ = driver_->connect(host_, user_, password);
-      stmt_ = con_->createStatement();
+      con_ = std::auto_ptr<sql::Connection>(driver_->connect(host_, user_, password));
+      stmt_ = std::auto_ptr<sql::Statement>(con_->createStatement());
 
       dataBase_ = Rafale::config["db.database"];
       if (!dataBase_.size())
@@ -59,37 +60,86 @@ namespace Rafale
       stmt_.reset(NULL);
     }
 
-    
-
-    inline std::string EscapeSpecialChar(const std::string& buffer)
+  public:
+    bool        Insert()
     {
-      std::string result;
-      for (auto it = begin(buffer); it != end(buffer); ++it)
+      std::string sql;
+      sql = "INSERT INTO `" + ChildModel::tableName + "` (";
+      for (auto member : ChildModel::datas_)
         {
-          switch (*it)
+          if ((find(begin(ChildModel::primary), end(ChildModel::primary), member.first) == end(ChildModel::primary))
+              && (member.second.Type() != Rafale::SQL::unknown))
             {
-            case '\\':
-              result += "\\\\";
-              break;
-            case '"':
-              result += "\\\"";
-              break;
-            default:
-              result += *it;
-              break;
+              sql += member.first + ", ";
             }
         }
-      return result + "\\n";
+      sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      sql += ") VALUES (";
+      for (auto member : ChildModel::datas_)
+        {
+          if ((find(begin(ChildModel::primary), end(ChildModel::primary), member.first) == end(ChildModel::primary))
+              && (member.second.Type() != Rafale::SQL::unknown))
+            {
+              sql += member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
+            }
+        }
+      sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      sql += ')';
+      std::cout << "insert : " << sql << std::endl;
+      // stmt_->execute(sql);
+      return true;  // TODO RETURN SUCCESS OF INSERT
     }
 
-    // void        Insert(const  &t)
-    // {
-      
-    // }
+    std::size_t        Update(const std::map<std::string, Rafale::SQL::Data<Rafale::SQL::Raw> > &where)
+    {
+      std::string sql;
+
+      sql = "UPDATE `" + ChildModel::tableName + "`";
+      sql += "SET ";
+      for (auto member : ChildModel::datas_)
+        {
+          if ((find(begin(ChildModel::primary), end(ChildModel::primary), member.first) == end(ChildModel::primary))
+              && (where[member.first].second.Type() == Rafale::SQL::unknown)
+              && (member.second.Type() != Rafale::SQL::unknown))
+            {
+              sql += member.first + "=" + member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
+            }
+        }
+      sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      sql += " WHERE ";
+      int i  = 0;
+      for (auto criteria : where)
+        {
+          if (i++)
+            sql += " AND ";
+          sql += criteria.first + "=" + criteria.second.Serialize();
+        }
+      std::cout << "update : " << sql << std::endl;
+      // stmt_->execute(sql);
+      return 1;  // TODO RETURN NB OF UPDATE
+    }
+
+    std::size_t        Delete(const std::map<std::string, Rafale::SQL::Data<Rafale::SQL::Raw> > &where)
+    {
+      std::string sql;
+
+      sql = "DELETE FROM `" + ChildModel::tableName + "`";
+      sql += " WHERE ";
+      int i  = 0;
+      for (auto criteria : where)
+        {
+          if (i++)
+            sql += " AND ";
+          sql += criteria.first + "=" + criteria.second.Serialize();
+        }
+      std::cout << "delete : " << sql << std::endl;
+      // stmt_->execute(sql);
+      return 1; // TODO RETURN NB OF DELETE
+    }
   private:
-    sql::Driver * driver_;
-    std::auto_ptr< sql::Connection > con_;
-    std::auto_ptr< sql::Statement > stmt_;
+    sql::Driver                         *driver_;
+    std::auto_ptr<sql::Connection>    con_;
+    std::auto_ptr<sql::Statement>     stmt_;
   protected:
     std::string dataBase_;
     std::string host_;
@@ -98,3 +148,4 @@ namespace Rafale
 }
 
 #endif /* _MODEL_H_ */
+
