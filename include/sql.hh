@@ -258,6 +258,16 @@ namespace Rafale
         return type_;
       }
 
+      bool      SetInt(ChildModel *ptr, int value)
+      {
+        if (Type() == SQL::integer)
+          {
+            ptr->*(data_.integer) = value;
+            return true;
+          }
+        return false;
+      }
+
     private:
       template <typename T>
       void      SetData_(T data)

@@ -87,6 +87,7 @@ namespace Rafale
             if ((find(begin(ChildModel::autoIncrements), end(ChildModel::autoIncrements), member.first) == end(ChildModel::autoIncrements))
                 && (member.second.Type() != Rafale::SQL::unknown))
               {
+
                 sql += member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
                 ++nbCommas;
               }
@@ -94,10 +95,22 @@ namespace Rafale
         if (nbCommas > 0)
           sql.erase(sql.end() - 2, sql.end()); // clean last comma
       }
-      sql += ')';
-      std::cout << "insert : " << sql << std::endl;
-      // stmt_->execute(sql);
-      return true;  // TODO RETURN SUCCESS OF INSERT
+      sql += ");";
+      stmt_->execute("START TRANSACTION");
+      stmt_->execute(sql);
+      std::unique_ptr<sql::ResultSet>  res(stmt_->executeQuery("SELECT LAST_INSERT_ID() FROM `" + ChildModel::tableName + "`"));
+      stmt_->execute("COMMIT");
+      // START TRANSACTION;
+      if (res->next())
+        {
+          for (auto autoIncrement : ChildModel::autoIncrements)
+            {
+              ChildModel::datas_[autoIncrement].SetInt(static_cast<ChildModel*>(this), res->getInt(1));
+            }
+          // stmt_->execute(sql);
+          return true;  // TODO RETURN SUCCESS OF INSERT
+        }
+      return false;
     }
 
     std::size_t        Update(const std::map<std::string, Rafale::SQL::Data<Rafale::SQL::Raw> > &where)
@@ -127,8 +140,7 @@ namespace Rafale
             sql += " AND ";
           sql += '`' + ChildModel::tableName  + "`.`" + criteria.first + "`="  + criteria.second.Serialize();
         }
-      std::cout << "update : " << sql << std::endl;
-      // stmt_->execute(sql);
+      stmt_->execute(sql);
       return 1;  // TODO RETURN NB OF UPDATE
     }
 
@@ -159,8 +171,7 @@ namespace Rafale
             sql += " AND ";
           sql += '`' + ChildModel::tableName  + "`.`" + primary + "`=" + ChildModel::datas_[primary].Serialize(static_cast<ChildModel*>(this));
         }
-      std::cout << "update : " << sql << std::endl;
-      // stmt_->execute(sql);
+      stmt_->execute(sql);
       return 1;  // TODO RETURN NB OF UPDATE
     }
 
@@ -177,8 +188,7 @@ namespace Rafale
             sql += " AND ";
           sql += '`' + ChildModel::tableName  + "`.`" + criteria.first + "`=" + criteria.second.Serialize();
         }
-      std::cout << "delete : " << sql << std::endl;
-      // stmt_->execute(sql);
+      stmt_->execute(sql);
       return 1; // TODO RETURN NB OF DELETE
     }
 
@@ -195,10 +205,10 @@ namespace Rafale
             sql += " AND ";
           sql += '`' + ChildModel::tableName  + "`.`" + primary + "`=" + ChildModel::datas_[primary].Serialize(static_cast<ChildModel*>(this));
         }
-      std::cout << "delete : " << sql << std::endl;
-      // stmt_->execute(sql);
+      stmt_->execute(sql);
       return 1; // TODO RETURN NB OF DELETE
     }
+
   private:
     sql::Driver                         *driver_;
     std::auto_ptr<sql::Connection>    con_;
