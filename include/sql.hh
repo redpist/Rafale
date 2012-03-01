@@ -76,7 +76,7 @@ namespace Rafale
 
 
       template <>
-      struct TypeToEnum<Raw, int*>
+      struct TypeToEnum<Raw, int>
       {
         static constexpr SQL::Type Type()
         {
@@ -85,7 +85,7 @@ namespace Rafale
       };
 
       template <>
-      struct TypeToEnum<Raw, float *>
+      struct TypeToEnum<Raw, float>
       {
         static constexpr SQL::Type Type()
         {
@@ -217,8 +217,8 @@ namespace Rafale
               case '\\':
                 result += "\\\\";
                 break;
-              case '"':
-                result += "\\\"";
+              case '\'':
+                result += "\\\'";
                 break;
               default:
                 result += *it;
@@ -244,7 +244,7 @@ namespace Rafale
             break;
 
           case SQL::string:
-            return '"' + EscapeSpecialChar(ptr->*(data_.string)) + '"';
+            return '\'' + EscapeSpecialChar(ptr->*(data_.string)) + '\'';
             break;
 
           default:
@@ -307,8 +307,8 @@ namespace Rafale
               case '\\':
                 result += "\\\\";
                 break;
-              case '"':
-                result += "\\\"";
+              case '\'':
+                result += "\\\'";
                 break;
               default:
                 result += *it;
@@ -334,7 +334,7 @@ namespace Rafale
             break;
 
           case SQL::string:
-            return '"' + EscapeSpecialChar(*(data_.string)) + '"';
+            return '\'' + EscapeSpecialChar(*(data_.string)) + '\'';
             break;
 
           default:

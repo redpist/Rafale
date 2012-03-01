@@ -65,25 +65,35 @@ namespace Rafale
     {
       std::string sql;
       sql = "INSERT INTO `" + ChildModel::tableName + "` (";
-      for (auto member : ChildModel::datas_)
-        {
-          if ((find(begin(ChildModel::primary), end(ChildModel::primary), member.first) == end(ChildModel::primary))
-              && (member.second.Type() != Rafale::SQL::unknown))
-            {
-              sql += member.first + ", ";
-            }
-        }
-      sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      {
+        int nbCommas = 0;
+        for (auto member : ChildModel::datas_)
+          {
+            if ((find(begin(ChildModel::autoIncrements), end(ChildModel::autoIncrements), member.first) == end(ChildModel::autoIncrements))
+                && (member.second.Type() != Rafale::SQL::unknown))
+              {
+                sql += member.first + ", ";
+                ++nbCommas;
+              }
+          }
+        if (nbCommas > 0)
+          sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      }
       sql += ") VALUES (";
-      for (auto member : ChildModel::datas_)
-        {
-          if ((find(begin(ChildModel::primary), end(ChildModel::primary), member.first) == end(ChildModel::primary))
-              && (member.second.Type() != Rafale::SQL::unknown))
-            {
-              sql += member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
-            }
-        }
-      sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      {
+        int nbCommas = 0;
+        for (auto member : ChildModel::datas_)
+          {
+            if ((find(begin(ChildModel::autoIncrements), end(ChildModel::autoIncrements), member.first) == end(ChildModel::autoIncrements))
+                && (member.second.Type() != Rafale::SQL::unknown))
+              {
+                sql += member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
+                ++nbCommas;
+              }
+          }
+        if (nbCommas > 0)
+          sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      }
       sql += ')';
       std::cout << "insert : " << sql << std::endl;
       // stmt_->execute(sql);
@@ -96,23 +106,58 @@ namespace Rafale
 
       sql = "UPDATE `" + ChildModel::tableName + "`";
       sql += "SET ";
-      for (auto member : ChildModel::datas_)
-        {
-          if ((find(begin(ChildModel::primary), end(ChildModel::primary), member.first) == end(ChildModel::primary))
-              && (where[member.first].second.Type() == Rafale::SQL::unknown)
-              && (member.second.Type() != Rafale::SQL::unknown))
-            {
-              sql += member.first + "=" + member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
-            }
-        }
-      sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      {
+        int nbCommas = 0;
+        for (auto member : ChildModel::datas_)
+          {
+            if ((find(begin(ChildModel::primaries), end(ChildModel::primaries), member.first) == end(ChildModel::primaries)) && (member.second.Type() != Rafale::SQL::unknown) && (where.find(member.first) == end(where)))
+              {
+                sql += '`' + ChildModel::tableName + "`.`"  + member.first + "`=" + member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
+                ++nbCommas;
+              }
+          }
+        if (nbCommas > 0)
+          sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      }
       sql += " WHERE ";
       int i  = 0;
       for (auto criteria : where)
         {
           if (i++)
             sql += " AND ";
-          sql += criteria.first + "=" + criteria.second.Serialize();
+          sql += '`' + ChildModel::tableName  + "`.`" + criteria.first + "`="  + criteria.second.Serialize();
+        }
+      std::cout << "update : " << sql << std::endl;
+      // stmt_->execute(sql);
+      return 1;  // TODO RETURN NB OF UPDATE
+    }
+
+    std::size_t        Update()
+    {
+      std::string sql;
+
+      sql = "UPDATE `" + ChildModel::tableName + "`";
+      sql += "SET ";
+      {
+        int nbCommas = 0;
+        for (auto member : ChildModel::datas_)
+          {
+            if ((find(begin(ChildModel::primaries), end(ChildModel::primaries), member.first) == end(ChildModel::primaries)) && (member.second.Type() != Rafale::SQL::unknown))
+              {
+                sql += '`' + ChildModel::tableName + "`.`"  + member.first + "`=" + member.second.Serialize(static_cast<ChildModel*>(this)) + ", ";
+                ++nbCommas;
+              }
+          }
+        if (nbCommas > 0)
+          sql.erase(sql.end() - 2, sql.end()); // clean last comma
+      }
+      sql += " WHERE ";
+      int i  = 0;
+      for (auto primary : ChildModel::primaries)
+        {
+          if (i++)
+            sql += " AND ";
+          sql += '`' + ChildModel::tableName  + "`.`" + primary + "`=" + ChildModel::datas_[primary].Serialize(static_cast<ChildModel*>(this));
         }
       std::cout << "update : " << sql << std::endl;
       // stmt_->execute(sql);
@@ -130,7 +175,25 @@ namespace Rafale
         {
           if (i++)
             sql += " AND ";
-          sql += criteria.first + "=" + criteria.second.Serialize();
+          sql += '`' + ChildModel::tableName  + "`.`" + criteria.first + "`=" + criteria.second.Serialize();
+        }
+      std::cout << "delete : " << sql << std::endl;
+      // stmt_->execute(sql);
+      return 1; // TODO RETURN NB OF DELETE
+    }
+
+    std::size_t        Delete()
+    {
+      std::string sql;
+
+      sql = "DELETE FROM `" + ChildModel::tableName + "`";
+      sql += " WHERE ";
+      int i  = 0;
+      for (auto primary : ChildModel::primaries)
+        {
+          if (i++)
+            sql += " AND ";
+          sql += '`' + ChildModel::tableName  + "`.`" + primary + "`=" + ChildModel::datas_[primary].Serialize(static_cast<ChildModel*>(this));
         }
       std::cout << "delete : " << sql << std::endl;
       // stmt_->execute(sql);
