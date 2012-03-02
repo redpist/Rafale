@@ -109,14 +109,6 @@ public:
 
   void  ParseController()
   {
-    std::size_t offset;
-    if ((offset = GetIdentifier(controllerName_)) != std::string::npos)
-      {
-        std::string     s0 = Consume(offset);
-        PopIdentifier();
-        s0 += "_Controller_" + controllerName_;
-        Product(s0 + Consume());
-      }
     // Print("C.");
     if (Action())
       {
@@ -163,6 +155,17 @@ public:
             Product(tmp);
             lockView_ = false;
             isInView_ = false;
+          }
+      }
+    else
+      {
+        std::size_t offset;
+        if ((offset = GetIdentifier(controllerName_)) != std::string::npos)
+          {
+            std::string     s0 = Consume(offset);
+            PopIdentifier();
+            s0 += "_Controller_" + controllerName_;
+            Product(s0 + Consume());
           }
       }
   }

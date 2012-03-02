@@ -125,7 +125,7 @@ namespace Rafale
                 break;
 
               case SQL::floating:
-                // member.second.Set(model, SQL::Tools::GetFloat<decltype(res), decltype(member.first)>(res, member.first));
+                member.second.Set(model, SQL::Tools::GetFloat<decltype(res), decltype(member.first)>(res, member.first));
                 break;
 
               case SQL::string:
