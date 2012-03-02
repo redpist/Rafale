@@ -39,6 +39,8 @@ namespace Rafale
     ~View() { }
     virtual void   Print() = 0;
     std::list<std::string>      scripts;
+    std::list<std::string>      styles;
+    std::list<std::string>      rawScripts;
   };
 }
 

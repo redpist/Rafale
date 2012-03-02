@@ -34,9 +34,29 @@ namespace Rafale
 {
   class Layout
   {
+    bool        disabled_;
   public:
-    Layout() { }
+    Layout() : disabled_(false) { }
     ~Layout() { }
+
+    void        Enable()
+    {
+      disabled_ = false;
+    }
+
+    void        Disable()
+    {
+      disabled_ = true;
+    }
+
+    void        RawPrint(Rafale::View &view)
+    {
+      if (disabled_)
+        view.Print();
+      else
+        Print(view);
+    }
+  protected:
     virtual void   Print(Rafale::View &) = 0;
   };
 }

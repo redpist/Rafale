@@ -126,7 +126,7 @@ public:
         if ((end = ActionEnd()) != std::string::npos)
           {
             lockAction_ = true;
-            std::string tmp = Consume(end) + "layout_->Print(view);\n"
+            std::string tmp = Consume(end) + "layout_->RawPrint(view);\n"
               "std::cout.rdbuf(_saveCoutRdbuf_);"
               "return _outputBuffer_.str();\n";
             tmp += Consume(1);
