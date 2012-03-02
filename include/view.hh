@@ -27,6 +27,7 @@
 #ifndef _RAFALE_VIEW_H_
 #define _RAFALE_VIEW_H_
 
+#include <list>
 #include <string>
 
 namespace Rafale
@@ -37,6 +38,7 @@ namespace Rafale
     View() { }
     ~View() { }
     virtual void   Print() = 0;
+    std::list<std::string>      scripts;
   };
 }
 

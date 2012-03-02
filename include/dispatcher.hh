@@ -29,6 +29,7 @@
 
 #include <string>
 #include <iostream>
+// #include <fstream>
 #include "controller.hh"
 
 class Dispatcher
@@ -36,11 +37,12 @@ class Dispatcher
 public:
   Dispatcher(std::string url)
   {
-    {
-      std::size_t offset = url.find("http://");
-      if (offset == 0)
-        url = url.substr(sizeof("http://") - 1, url.size() - sizeof("http://") + 1);
-    }
+    // std::ofstream outputFile("/var/log/rafale/dispatcher.log"); // LOGS
+    // {
+    //   std::size_t offset = url.find("http://");
+    //   if (offset == 0)
+    //     url = url.substr(sizeof("http://") - 1, url.size() - sizeof("http://") + 1);
+    // }
     std::size_t startController = url.find("/");
     if (startController == std::string::npos)
       {
