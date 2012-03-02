@@ -28,6 +28,7 @@
 #define _RAFALE_QUERY_H_
 
 #include <list>
+#include <fstream>
 #include "config.hh"
 #include "sql/tools.hh"
 
@@ -44,6 +45,9 @@ namespace Rafale
       std::string dataBase;
       std::string host;
       std::string user;
+
+
+      // std::ofstream outputFile("/var/log/rafale/query.log"); // LOGS
 
       host = Rafale::config["db.host"];
       if (!host.size())
@@ -97,6 +101,12 @@ namespace Rafale
               sql += '`' + CurrentModel::tableName  + "`.`" + criteria.first + "`="  + criteria.second.Serialize();
             }
         }
+
+      // if (outputFile.is_open()) // LOGS
+      //   {
+      //     outputFile << "Query: " << sql << std::endl;
+      //   }
+
       std::shared_ptr<std::list<CurrentModel>> result(new std::list<CurrentModel>());
       std::unique_ptr<sql::ResultSet>  res(statement->executeQuery(sql));
       while (res->next())
@@ -107,6 +117,10 @@ namespace Rafale
             switch (member.second.Type())
               {
               case SQL::integer:
+                member.second.Set(model, res->getInt(member.first));
+                break;
+
+              case SQL::boolean:
                 member.second.Set(model, res->getInt(member.first));
                 break;
 

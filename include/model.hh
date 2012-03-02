@@ -208,6 +208,9 @@ namespace Rafale
       return 1; // TODO RETURN NB OF DELETE
     }
 
+
+  typedef std::shared_ptr<std::list<ChildModel> >     List;
+
   private:
     sql::Driver                         *driver_;
     std::shared_ptr<sql::Connection>    con_;

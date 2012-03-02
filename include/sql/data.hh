@@ -40,6 +40,7 @@ namespace Rafale
         unknown = 0,
         integer,
         floating,
+        boolean,
         // dateTime,
         string,
       };
@@ -77,6 +78,15 @@ namespace Rafale
         static constexpr SQL::Type Type()
         {
           return SQL::integer;
+        }
+      };
+
+      template <class ChildModel>
+      struct TypeToEnum<ChildModel, bool ChildModel::*>
+      {
+        static constexpr SQL::Type Type()
+        {
+          return SQL::boolean;
         }
       };
 
@@ -119,6 +129,15 @@ namespace Rafale
       };
 
       template <>
+      struct TypeToEnum<Raw, bool>
+      {
+        static constexpr SQL::Type Type()
+        {
+          return SQL::boolean;
+        }
+      };
+
+      template <>
       struct TypeToEnum<Raw, float>
       {
         static constexpr SQL::Type Type()
@@ -135,6 +154,7 @@ namespace Rafale
       {
         String          (ChildModel::*string);
         int             (ChildModel::*integer);
+        bool            (ChildModel::*boolean);
         float           (ChildModel::*floating);
         // DateTime        *dateTime;
       };
@@ -142,8 +162,9 @@ namespace Rafale
       template <>
       union BasicData<Raw>
       {
-        String          *string;
+        String         *string;
         int             integer;
+        bool            boolean;
         float           floating;
       };
 
@@ -182,6 +203,16 @@ namespace Rafale
       };
 
       template <class ChildModel>
+      struct Assign<ChildModel, bool (ChildModel::*)>
+      {
+        Assign(BasicData<ChildModel> &data_, bool ChildModel::*boolean)
+        {
+          data_.boolean = boolean;
+        }
+      };
+
+
+      template <class ChildModel>
       struct Assign<ChildModel, float (ChildModel::*)>
       {
         Assign(BasicData<ChildModel> &data_, float ChildModel::*floating)
@@ -215,6 +246,15 @@ namespace Rafale
         Assign(BasicData<Raw> &data_, int integer)
         {
           data_.integer = integer;
+        }
+      };
+
+      template <>
+      struct Assign<Raw, bool>
+      {
+        Assign(BasicData<Raw> &data_, bool boolean)
+        {
+          data_.boolean = boolean;
         }
       };
 
@@ -273,6 +313,11 @@ namespace Rafale
           {
           case SQL::integer:
             tmp << ptr->*(data_.integer);
+            return tmp.str();
+            break;
+
+          case SQL::boolean:
+            tmp << ptr->*(data_.boolean);
             return tmp.str();
             break;
 
@@ -346,6 +391,17 @@ namespace Rafale
         return false;
       }
 
+
+      bool      Set(ChildModel *ptr, bool value)
+      {
+        if (Type() == SQL::boolean)
+          {
+            ptr->*(data_.boolean) = value;
+            return true;
+          }
+        return false;
+      }
+
       bool      Set(ChildModel *ptr, float value)
       {
         if (Type() == SQL::floating)
@@ -398,9 +454,9 @@ namespace Rafale
         SetData_(data);
       }
 
-      Data(const Data<Raw> &other) : type_(other.type_)
+      Data(const Data<Raw> &other) : type_(other.type_), data_(other.data_)
       {
-        switch (other.Type())
+        switch (type_)
           {
           case SQL::string:
             data_.string = new String(*other.data_.string);
@@ -462,6 +518,11 @@ namespace Rafale
           {
           case SQL::integer:
             tmp << data_.integer;
+            return tmp.str();
+            break;
+
+          case SQL::boolean:
+            tmp << data_.boolean;
             return tmp.str();
             break;
 

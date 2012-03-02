@@ -40,6 +40,7 @@ protected:
     while (!cchtmlFile.eof())
       {
         getline(cchtmlFile, buffer_);
+        buffer_ += '\n';
 notInCplusplus:
         if (!isInCPlusPlus_)
           {
@@ -73,7 +74,7 @@ inCplusplus:
 
   void  PrintHtml(const std::string& buffer)
   {
-    (*outputFile_) << "std::cout << \"" << EscapeSpecialChar(buffer) << "\";\n";
+    (*outputFile_) << "std::cout << \"" << EscapeSpecialChar(buffer) << "\";";
   }
 
   void  PrintCPlusPlus(const std::string& buffer)
@@ -94,12 +95,15 @@ inCplusplus:
           case '"':
             result += "\\\"";
             break;
+          case '\n':
+            result += "\\n";
+            break;
           default:
             result += *it;
             break;
           }
       }
-    return result + "\\n";
+    return result;
   }
 
   std::ofstream *outputFile_;

@@ -31,6 +31,7 @@
 #include "controller_generator.hh"
 #include "view_generator.hh"
 #include "layout_generator.hh"
+#include "model_generator.hh"
 #include <list>
 
 class Generator
@@ -70,6 +71,22 @@ public:
             std::cout << "layout : " << file.ShortName() << std::endl;
             layoutGenerator_.Generate(path + "/layouts/" + file.Path(), path + "/generated/._layout_" + file.ShortName() + ".hh", file.ShortName());
             layouts_[file.ShortName()] = "._layout_" + file.ShortName() + ".hh";
+          }
+        }
+    }
+    {
+      R0x::System::Directory      modelsDirectory(path + "/models");
+      auto fileList = modelsDirectory.List();
+      for (auto file: fileList)
+        {
+          if (file.Path() != "." && file.Path() != ".." &&
+              (file.Extension() == ".cc" || file.Extension() == ".cpp"
+               || file.Extension() == ".hh"  || file.Extension() == ".h"  || file.Extension() == ".hpp"))
+          {
+            std::cout << "model : " << file.Path() << std::endl;
+            modelGenerator_.Generate(path + "/models/" + file.Path(), path + "/generated/models/" + file.Path());
+            if (file.Extension() == ".cc" || file.Extension() == ".cpp")
+              files_[path + "/generated/models/" + file.Path()];
           }
         }
     }
@@ -180,7 +197,7 @@ public:
         "NAME = public/index.fcgi\n"
         "\n"
         "all : $(OBJ)\n"
-        "	@$(CXX) $(OBJ) -l fcgi -o $(NAME)\n"
+        "	@$(CXX) $(OBJ) -l fcgi -lmysqlclient_r -lmysqlcppconn -o $(NAME)\n"
         "	@echo 'Building target : ' $(NAME)\n"
         "\n"
         ".cc.o :\n"
@@ -208,6 +225,7 @@ private:
   ControllerGenerator   controllerGenerator_;
   ViewGenerator         viewGenerator_;
   LayoutGenerator         layoutGenerator_;
+  ModelGenerator         modelGenerator_;
 };
 
 
