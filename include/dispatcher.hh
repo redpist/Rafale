@@ -38,6 +38,11 @@ public:
   Dispatcher(std::string url)
   {
     // std::ofstream outputFile("/var/log/rafale/dispatcher.log"); // LOGS
+    // if (outputFile.is_open()) // LOGS
+    //   {
+    //     outputFile << "Url: " << url << std::endl;
+    //   }
+
     // {
     //   std::size_t offset = url.find("http://");
     //   if (offset == 0)
@@ -96,6 +101,5 @@ private:
   std::string   controller_;
   std::string   action_;
 };
-
 
 #endif /* _DISPATCHER_H_ */

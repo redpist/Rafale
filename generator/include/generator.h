@@ -158,23 +158,34 @@ public:
           mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
         }
       mainFile << "};\n";
-      mainFile << "#include \"fcgi_stdio.h\"\n"
-        "int main(void)\n"
-        "{\n"
-        "while(FCGI_Accept() >= 0)"
-        "{\n"
-         "try\n{\n"
-          "FCGI_printf(\"Content-type: text/html\\r\\n\\r\\n\");"
-          "Dispatcher dispatcher(getenv(\"SCRIPT_FILENAME\"));\n"
-          "Rafale::Controller    *p = Caller::Make(dispatcher.Controller());\n"
-          "FCGI_printf(\"%s\", p->Action(dispatcher.Action()).c_str());\n"
-          "delete p;\n"
-         "}\n"
-         "catch(const char*s) {\n"
-          "std::cerr << s << std::endl;"
-          "}\n"
-         "}\n"
-        "}\n";
+      std::ifstream rawMainFile("/home/redpist/dev/Rafale/src/raw_main.cc");
+      std::string       buffer;
+      if (!rawMainFile.is_open())
+        throw ("no rawMain file : /home/redpist/dev/Rafale/src/raw_main.cc");
+      while (!rawMainFile.eof())
+        {
+          getline(rawMainFile, buffer);
+          buffer += '\n';
+          mainFile << buffer;
+        }
+
+    }
+
+    {
+      std::ifstream toolsFile("/home/redpist/dev/Rafale/src/tools.cc");
+      std::ofstream outputFile(path + "/generated/.tools.cc");
+      std::string       buffer;
+      if (!toolsFile.is_open())
+        throw ("no tools file : /home/redpist/dev/Rafale/src/tools.cc");
+      if (!outputFile.is_open())
+        throw ("problem while opening : " + path + "/generated/.tools.cc");
+      while (!toolsFile.eof())
+        {
+          getline(toolsFile, buffer);
+          buffer += '\n';
+          outputFile << buffer;
+        }
+      files_[path + "/generated/.tools.cc"];
     }
 
     {

@@ -27,9 +27,19 @@
 #ifndef _RAFALE_H_
 #define _RAFALE_H_
 
+#include <map>
+#include <string>
+
+namespace Rafale
+{
+  extern std::map<std::string, std::string>       serverDatas;
+  extern std::map<std::string, std::string>       getDatas;
+}
+
 #include "model.hh"
 #include "controller.hh"
 #include "view.hh"
+#include "tools.hh"
 
 
 #endif /* _RAFALE_H_ */
