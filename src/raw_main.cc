@@ -92,9 +92,25 @@ void    GetPostData()
 
 int main(void)
 {
+  {
+    std::ofstream outputFile("/var/log/rafale/preindex.log"); // LOGS
+    if (outputFile.is_open()) // LOGS
+      {
+        outputFile << "TEST: " << std::endl;
+      }
+  }
+
   while(FCGI_Accept() >= 0)
     {
       try {
+        {
+            std::ofstream outputFile("/var/log/rafale/index.log"); // LOGS
+            if (outputFile.is_open()) // LOGS
+              {
+                outputFile << "TEST: " << std::endl;
+              }
+        }
+
         FCGI_printf("Content-type: text/html\r\n\r\n");
         Dispatcher dispatcher(getenv("SCRIPT_FILENAME"));
         Rafale::Controller    *p = Caller::Make(dispatcher.Controller());
