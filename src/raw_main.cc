@@ -53,10 +53,41 @@ void    SetContent()
     Rafale::serverDatas["CONTENT"];
 }
 
+void    ParseMultipart()
+{
+  std::size_t offset = 0;
+  std::size_t nextOffset;
+
+  /*      while (nextOffset = Rafale::serverDatas["CONTENT"].find("--" + Rafale::serverDatas["boundary"], offset))
+        {
+          offset += Rafale::serverDatas["boundary"].size() + 3;
+          std::size_t nameOffset = Rafale::serverDatas["CONTENT"].find("name=\"", offset);
+          if (
+              offset = nextOffset + 1;                                                                                       //   A FINIR !!!
+              }*/
+
+
+  //                                                                                    TO DO !!!
+}
+
 void    GetPostData()
 {
   Rafale::postDatas.clear();
-  SetVariables(Rafale::serverDatas["CONTENT"], Rafale::postDatas);
+  // reminder : something weird with int convertion to string
+  if (Rafale::serverDatas["CONTENT_TYPE"].find("multipart/form-data; boundary=") == 0)
+    {
+      Rafale::serverDatas["boundary"] =
+        Rafale::serverDatas["CONTENT_TYPE"].substr(
+                                                   sizeof("multipart/form-data; boundary=") - 1,
+                                                   Rafale::serverDatas["CONTENT_TYPE"].size()
+                                                   - sizeof("multipart/form-data; boundary=") + 1);
+      ParseMultipart();
+      // Rafale::serverDatas["FILE"] = Rafale::serverDatas["CONTENT"];
+    }
+  else
+    {
+      SetVariables(Rafale::serverDatas["CONTENT"], Rafale::postDatas);
+    }
 };
 
 int main(void)
