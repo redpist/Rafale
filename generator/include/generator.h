@@ -158,10 +158,10 @@ public:
           mainFile << "{\"" + controller.first + "\", &" + "Make" + controller.first + "},\n";
         }
       mainFile << "};\n";
-      std::ifstream rawMainFile("/home/redpist/dev/Rafale/src/raw_main.cc");
+      std::ifstream rawMainFile("/usr/share/rafale/src/raw_main.cc");
       std::string       buffer;
       if (!rawMainFile.is_open())
-        throw ("no rawMain file : /home/redpist/dev/Rafale/src/raw_main.cc");
+        throw ("no rawMain file : /usr/share/rafale/src/raw_main.cc");
       while (!rawMainFile.eof())
         {
           getline(rawMainFile, buffer);
@@ -172,11 +172,11 @@ public:
     }
 
     {
-      std::ifstream toolsFile("/home/redpist/dev/Rafale/src/tools.cc");
+      std::ifstream toolsFile("/usr/share/rafale/src/tools.cc");
       std::ofstream outputFile(path + "/generated/.tools.cc");
       std::string       buffer;
       if (!toolsFile.is_open())
-        throw ("no tools file : /home/redpist/dev/Rafale/src/tools.cc");
+        throw ("no tools file : /usr/share/rafale/src/tools.cc");
       if (!outputFile.is_open())
         throw ("problem while opening : " + path + "/generated/.tools.cc");
       while (!toolsFile.eof())
@@ -197,7 +197,7 @@ public:
         "\n"
         "CXX							= g++-4.6\n"
         "CXXFLAGS				= -std=c++0x -O3 -Wall -Wextra\n"
-        "INCPATH					= ~/dev/Rafale/include/\n"
+        "INCPATH					= /usr/share/rafale/include/\n"
         "SOURCES					= ";
         for (auto file: files_)
           {
