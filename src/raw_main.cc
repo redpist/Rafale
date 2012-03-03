@@ -92,35 +92,36 @@ void    GetPostData()
 
 int main(void)
 {
-  {
-    std::ofstream outputFile("/var/log/rafale/preindex.log"); // LOGS
-    if (outputFile.is_open()) // LOGS
-      {
-        outputFile << "TEST: " << std::endl;
-      }
-    else
-      std::cout << "BORDEL" << std::endl;
-  }
-
   while(FCGI_Accept() >= 0)
     {
       try {
-        {
-            std::ofstream outputFile("/var/log/rafale/index.log"); // LOGS
-            if (outputFile.is_open()) // LOGS
-              {
-                outputFile << "TEST: " << std::endl;
-              }
-        }
-
         FCGI_printf("Content-type: text/html\r\n\r\n");
         Dispatcher dispatcher(getenv("SCRIPT_FILENAME"));
+
+        std::ofstream outputFile("/var/log/rafale/index.log"); // LOGS
+
+        if (outputFile.is_open()) // LOGS
+          outputFile << "AFTER SISI: " << std::endl;
+
         Rafale::Controller    *p = Caller::Make(dispatcher.Controller());
+
+        if (outputFile.is_open()) // LOGS
+          outputFile << "AFTER SISI 1: " << std::endl;
         GetServerData();
+        if (outputFile.is_open()) // LOGS
+          outputFile << "AFTER SISI 2: " << std::endl;
         SetContent();
+        if (outputFile.is_open()) // LOGS
+          outputFile << "AFTER SISI 3: " << std::endl;
         GetGetData();
+        if (outputFile.is_open()) // LOGS
+          outputFile << "AFTER SISI 4: " << std::endl;
         GetPostData();
+        if (outputFile.is_open()) // LOGS
+          outputFile << "AFTER SISI 5: " << std::endl;
         FCGI_printf("%s", p->Action(dispatcher.Action()).c_str());
+        if (outputFile.is_open()) // LOGS
+          outputFile << "AFTER SISI 6: " << std::endl;
         delete p;
       }
       catch(const char*s) {
