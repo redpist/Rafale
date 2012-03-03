@@ -34,6 +34,7 @@ namespace Rafale
 {
   extern std::map<std::string, std::string>       serverDatas;
   extern std::map<std::string, std::string>       getDatas;
+  extern std::map<std::string, std::string>       postDatas;
 }
 
 #include "model.hh"

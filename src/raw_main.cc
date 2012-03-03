@@ -18,21 +18,46 @@ void    GetServerData()
     }
 };
 
-void    GetGetData()
+void     SetVariables(const std::string &rawData, std::map<std::string, std::string> &container)
 {
-  Rafale::getDatas.clear();
-  std::string queryString = Rafale::serverDatas["QUERY_STRING"];
+  std::string   queryString = rawData;
   while (queryString.find("&") != std::string::npos)
     {
-      Rafale::getDatas[queryString.substr(0, queryString.find("="))] = Rafale::UriDecode(queryString.substr(queryString.find("=") + 1, queryString.find("&") - queryString.find("=") - 1));
+      container[queryString.substr(0, queryString.find("="))] = Rafale::UriDecode(queryString.substr(queryString.find("=") + 1, queryString.find("&") - queryString.find("=") - 1));
       queryString = queryString.substr(queryString.find("&") + 1, queryString.size() - queryString.find("&") - 1);
     }
   if (queryString.size()) {
-    Rafale::getDatas[queryString.substr(0, queryString.find("="))] = Rafale::UriDecode(queryString.substr(queryString.find("=") + 1, queryString.size()));
+    container[queryString.substr(0, queryString.find("="))] = Rafale::UriDecode(queryString.substr(queryString.find("=") + 1, queryString.size()));
   }
+}
+
+void    GetGetData()
+{
+  Rafale::getDatas.clear();
+  SetVariables(Rafale::serverDatas["QUERY_STRING"], Rafale::getDatas);
 };
 
+#define NO_FCGI_DEFINES
 #include "fcgi_stdio.h"
+
+void    SetContent()
+{
+  int   length = Rafale::ToInt(Rafale::serverDatas["CONTENT_LENGTH"]);
+  if (length)
+    {
+      char  *rawBuffer = new char [length];
+      FCGI_fread(rawBuffer, length, 1, FCGI_stdin);
+      Rafale::serverDatas["CONTENT"].append(rawBuffer, length);
+    }
+  else
+    Rafale::serverDatas["CONTENT"];
+}
+
+void    GetPostData()
+{
+  Rafale::postDatas.clear();
+  SetVariables(Rafale::serverDatas["CONTENT"], Rafale::postDatas);
+};
 
 int main(void)
 {
@@ -43,7 +68,9 @@ int main(void)
         Dispatcher dispatcher(getenv("SCRIPT_FILENAME"));
         Rafale::Controller    *p = Caller::Make(dispatcher.Controller());
         GetServerData();
+        SetContent();
         GetGetData();
+        GetPostData();
         FCGI_printf("%s", p->Action(dispatcher.Action()).c_str());
         delete p;
       }
