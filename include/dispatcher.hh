@@ -29,19 +29,19 @@
 
 #include <string>
 #include <iostream>
-// #include <fstream>
 #include "controller.hh"
+#include <fstream>
 
 class Dispatcher
 {
 public:
   Dispatcher(std::string url)
   {
-    // std::ofstream outputFile("/var/log/rafale/dispatcher.log"); // LOGS
-    // if (outputFile.is_open()) // LOGS
-    //   {
-    //     outputFile << "Url: " << url << std::endl;
-    //   }
+    std::ofstream outputFile("/var/log/rafale/dispatcher.log"); // LOGS
+    if (outputFile.is_open()) // LOGS
+      {
+        outputFile << "Url: " << url << std::endl;
+      }
 
     // {
     //   std::size_t offset = url.find("http://");
