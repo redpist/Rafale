@@ -98,6 +98,8 @@ int main(void)
       {
         outputFile << "TEST: " << std::endl;
       }
+    else
+      std::cout << "BORDEL" << std::endl;
   }
 
   while(FCGI_Accept() >= 0)
