@@ -1,8 +1,48 @@
-// almost all the above code found at http://www.codeguru.com/cpp/cpp/string/conversions/article.php/c12759
-
 #include "tools.hh"
 #include <cstdint>
 #include <sstream>
+#include <string>
+
+std::string Rafale::Replace(const std::string &str, const std::string &token, const std::string &newToken)
+{
+  std::string   result;
+
+  std::size_t   prevOffset = 0;
+  std::size_t   offset = 0;
+  while ((offset = str.find(token, offset)) != std::string::npos)
+    {
+      result.append(str, prevOffset, offset - prevOffset);
+      result += newToken;
+      offset += token.size();
+      prevOffset = offset;
+    }
+  result.append(str, prevOffset, str.size() - prevOffset);
+  return result;
+}
+
+std::string Rafale::DeleteEOS(const std::string &str)
+{
+  std::string newContent;
+  for (char c: str)
+    {
+      if (c)
+        newContent += c;
+    }
+  return newContent;
+}
+
+std::string   &Rafale::ToLower(std::string &value)
+{
+  for (char &c: value)
+    {
+      if (c >= 'A' && c <= 'Z')
+        c += ('a' - 'A');
+    }
+  return value;
+}
+
+
+// almost all the above code found at http://www.codeguru.com/cpp/cpp/string/conversions/article.php/c12759
 
 const char HEX2DEC[256] =
   {
@@ -105,21 +145,9 @@ const char SAFE[256] =
 
 std::string Rafale::UriEncode(const std::string & sSrc)
 {
-  std::string   nNew;
-  int i;
-  std::size_t offset;
-  for (i = 0; (offset = sSrc.find(' ', i)) != std::string::npos;)
-    {
-      std::stringstream ss;
-      ss << offset;
-      nNew += sSrc.substr(i, offset - i) + '+';
-      i += (offset - i) + 1;
-    }
-  nNew += sSrc.substr(i, sSrc.size() - i);
-
   const char DEC2HEX[16 + 1] = "0123456789ABCDEF";
-  const unsigned char * pSrc = (const unsigned char *)nNew.c_str();
-  const int SRC_LEN = nNew.length();
+  const unsigned char * pSrc = (const unsigned char *)sSrc.c_str();
+  const int SRC_LEN = sSrc.length();
   unsigned char * const pStart = new unsigned char[SRC_LEN * 3];
   unsigned char * pEnd = pStart;
   const unsigned char * const SRC_END = pSrc + SRC_LEN;
@@ -139,5 +167,17 @@ std::string Rafale::UriEncode(const std::string & sSrc)
 
   std::string sResult((char *)pStart, (char *)pEnd);
   delete [] pStart;
-  return sResult;
+
+  std::string   nNew;
+  int i;
+  std::size_t offset;
+  for (i = 0; (offset = sResult.find(' ', i)) != std::string::npos;)
+    {
+      std::stringstream ss;
+      ss << offset;
+      nNew += sResult.substr(i, offset - i) + '+';
+      i += (offset - i) + 1;
+    }
+  nNew += sResult.substr(i, sResult.size() - i);
+  return nNew;
 }

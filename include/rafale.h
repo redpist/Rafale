@@ -35,12 +35,20 @@ namespace Rafale
   extern std::map<std::string, std::string>       serverDatas;
   extern std::map<std::string, std::string>       getDatas;
   extern std::map<std::string, std::string>       postDatas;
+  extern std::string                              tmpDirectory;
+  extern std::string                              filesDirectory;
+  extern std::string                              sessionsDirectory;
+
+  // extern std::map<std::string, std::string>       headers;
 }
 
 #include "model.hh"
 #include "controller.hh"
 #include "view.hh"
+#include "cookies.hh"
 #include "tools.hh"
 
+#include "file.hh"
+#include "sessions.hh"
 
 #endif /* _RAFALE_H_ */

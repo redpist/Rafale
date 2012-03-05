@@ -24,50 +24,52 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_TOOLS_H_
-#define _RAFALE_TOOLS_H_
+#ifndef _RAFALE_COOKIES_H_
+#define _RAFALE_COOKIES_H_
 
+#include "rafale.h"
+#include "tools.hh"
 #include <string>
-#include <sstream>
-#include <assert.h>
+#include <map>
 
 namespace Rafale
 {
-  std::string UriDecode(const std::string & sSrc);
-  std::string UriEncode(const std::string & sSrc);
-
-  std::string Replace(const std::string &str, const std::string &token, const std::string &newToken);
-  std::string DeleteEOS(const std::string &str);
-
-  template <typename T>
-  int   ToInt(const T &value)
+  class Cookie
   {
-    std::stringstream ss;
-    ss << value;
-    int i;
-    ss >> i;
-    return i;
-  }
+  public:
+    Cookie(const std::string &value = "") : modified(true), value_(value)
+    {
+    }
 
-  template <typename T>
-  float   ToFloat(const T &value)
-  {
-    std::stringstream ss;
-    ss << value;
-    float i;
-    ss >> i;
-    return i;
-  }
+    Cookie &operator=(const std::string &value)
+    {
+      modified = true;
+      value_ = Rafale::Replace(value, ";", "");
+      value_ = Rafale::Replace(value_, "\r\n", "");
+      return *this;
+    }
 
-  template <typename T>
-  std::string   ToString(const T &value)
-  {
-    std::stringstream ss;
-    ss << value;
-    return ss.str();
-  }
+    Cookie &operator=(const Cookie &oth)
+    {
+      modified = true;
+      value_ = oth.value_;
+      return *this;
+    }
 
-  std::string   &ToLower(std::string &value);
+    const std::string &Value()
+    {
+      return value_;
+    }
+
+    ~Cookie() { }
+
+    bool        modified;
+  private:
+    std::string value_;
+  };
+
+
+  extern std::map<std::string, Rafale::Cookie>       cookies;
 }
 
-#endif /* _RAFALE_TOOLS_H_ */
+#endif /* _RAFALE_COOKIES_H_ */

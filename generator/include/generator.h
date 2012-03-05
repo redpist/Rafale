@@ -131,6 +131,10 @@ public:
       files_[path + "/generated/.main.cc"];
       std::ofstream mainFile(path + "/generated/.main.cc");
       mainFile << "#include <cstdlib>\n"
+        "#include <ctime>\n"
+        "#include <sys/stat.h>\n"
+        "#include <sys/types.h>\n"
+        "#include <unistd.h>\n"
         "#include <map>\n#include <string>\n#include <dispatcher.hh>\n\n";
       for (auto controller : controllers_)
         {
