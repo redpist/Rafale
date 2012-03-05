@@ -111,6 +111,15 @@ namespace Rafale
       };
 
       template <>
+      struct TypeToEnum<Raw, String>
+      {
+        static constexpr SQL::Type Type()
+        {
+          return SQL::string;
+        }
+      };
+
+      template <>
       struct TypeToEnum<Raw, const char*>
       {
         static constexpr SQL::Type Type()
@@ -224,6 +233,15 @@ namespace Rafale
       // With Raw Data (pointer to none pod (no enought with c++0x) and data for pod)
       template <>
       struct Assign<Raw, const String &>
+      {
+        Assign(BasicData<Raw> &data_, const String &string)
+        {
+          data_.string = new String(string);
+        }
+      };
+
+      template <>
+      struct Assign<Raw, String>
       {
         Assign(BasicData<Raw> &data_, const String &string)
         {
@@ -444,6 +462,9 @@ namespace Rafale
       Internal_::BasicData<ChildModel>      data_;
     };
 
+
+    // RAW SPECIALIZATION
+
     template <>
     class Data<Raw>
     {
@@ -471,7 +492,6 @@ namespace Rafale
           }
 
       }
-
 
       ~Data()
       {

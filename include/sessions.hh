@@ -74,17 +74,17 @@ namespace Rafale
 
     static Session &Get()
     {
-      if (Rafale::cookies["session-id"].Value().size()
-          && Session::sessionMap_.find(Rafale::cookies["session-id"].Value()) != end(Session::sessionMap_))
+      if (Rafale::cookies["sessionid"].Value().size()
+          && Session::sessionMap_.find(Rafale::cookies["sessionid"].Value()) != end(Session::sessionMap_))
         {
-          auto it = Session::sessionMap_.find(Rafale::cookies["session-id"].Value());
+          auto it = Session::sessionMap_.find(Rafale::cookies["sessionid"].Value());
           it->second->Load();
           return *(it->second);
         }
       else
         {
           std::string id = Rafale::ToString(rand()) + Rafale::ToString(rand()) + Rafale::ToString(rand());
-          Rafale::cookies["session-id"] = id;
+          Rafale::cookies["sessionid"] = id;
           time_t expire = time(0) + 1800;
           auto session = sessions_.insert(std::pair<time_t, Session>(expire, Session(id, expire)));
           sessionMap_.insert(std::pair<std::string, Session*>(id, &(session.first->second)));
@@ -114,7 +114,7 @@ namespace Rafale
         {
           for (auto &data: datas_)
             {
-              if (data.first.size() || data.second.size())
+              if (data.first.size() && data.second.size())
                 tmpFile << Rafale::UriEncode(data.first) << "\n" << Rafale::UriEncode(data.second) << "\n";
             }
         }
@@ -134,6 +134,8 @@ namespace Rafale
               std::string   value;
               getline(tmpFile, value);
               datas_[Rafale::UriDecode(name)] = Rafale::UriDecode(value);
+              std::ofstream tmpFile2(Rafale::sessionsDirectory + "/SAVE");
+              tmpFile2 << "PLI";
             }
         }
       upToDate_ = true;

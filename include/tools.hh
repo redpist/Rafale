@@ -67,7 +67,8 @@ namespace Rafale
     return ss.str();
   }
 
-  std::string   &ToLower(std::string &value);
+  std::string   ToLower(const std::string &value);
+  bool    Exist(const std::string &fileName);
 }
 
 #endif /* _RAFALE_TOOLS_H_ */

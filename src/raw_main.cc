@@ -1,3 +1,5 @@
+#include <sys/types.h>
+#include <dirent.h>
 
 namespace Rafale
 {
@@ -22,7 +24,7 @@ void    GetServerData()
   for (env = environ; *env != 0; env++)
     {
       std::string var(*env);
-      Rafale::serverDatas[var.substr(0, var.find("="))] = var.substr(var.find("=") + 1, var.size());
+      Rafale::serverDatas[var.substr(0, var.find("="))] = var.substr(var.find("=") + 1, var.size() - var.find("="));
     }
 };
 
@@ -50,15 +52,18 @@ void    GetGetData()
 
 void    SetContent()
 {
-  int   length = Rafale::ToInt(Rafale::serverDatas["CONTENT_LENGTH"]);
-  if (length)
+  if (Rafale::serverDatas["CONTENT_LENGTH"].size())
     {
-      char  *rawBuffer = new char [length];
-      FCGI_fread(rawBuffer, length, 1, FCGI_stdin);
-      Rafale::serverDatas["CONTENT"].append(rawBuffer, length);
+      int   length = Rafale::ToInt(Rafale::serverDatas["CONTENT_LENGTH"]);
+      if (length)
+        {
+          char  *rawBuffer = new char [length];
+          FCGI_fread(rawBuffer, length, 1, FCGI_stdin);
+          Rafale::serverDatas["CONTENT"].append(rawBuffer, length);
+        }
+      else
+        Rafale::serverDatas["CONTENT"];
     }
-  else
-    Rafale::serverDatas["CONTENT"];
 }
 
 std::string     ParseValue(const std::string &name, const std::string &str, std::size_t offset = 0, char assign = '=', char startDelim = '"', char endDelim = '"')
@@ -158,17 +163,21 @@ void    GetPostData()
 
 void    GetCookies()
 {
-  std::size_t prevOffset = 0;
-  for (std::size_t offset = 0; (offset = Rafale::serverDatas["HTTP_COOKIE"].find("; ", offset)); prevOffset = offset)
+  if (Rafale::serverDatas["HTTP_COOKIE"].size())
     {
-      if (offset == std::string::npos)
-        offset = Rafale::serverDatas["HTTP_COOKIE"].size();
-      std::size_t equal = Rafale::serverDatas["HTTP_COOKIE"].find("=", prevOffset);
-      Rafale::cookies[Rafale::UriDecode(Rafale::serverDatas["HTTP_COOKIE"].substr(prevOffset, equal - prevOffset))]
-        = Rafale::UriDecode(Rafale::serverDatas["HTTP_COOKIE"].substr(equal + 1, offset - equal - 1));
-      if (offset == Rafale::serverDatas["HTTP_COOKIE"].size())
-        break;
-      offset += 2;
+      std::size_t prevOffset = 0;
+      for (std::size_t offset = 2; (offset = Rafale::serverDatas["HTTP_COOKIE"].find("; ", offset)); prevOffset = offset)
+        {
+          
+          if (offset == std::string::npos)
+            offset = Rafale::serverDatas["HTTP_COOKIE"].size();
+          std::size_t equal = Rafale::serverDatas["HTTP_COOKIE"].find("=", prevOffset);
+          Rafale::cookies[Rafale::UriDecode(Rafale::serverDatas["HTTP_COOKIE"].substr(prevOffset, equal - prevOffset))]
+            = Rafale::UriDecode(Rafale::serverDatas["HTTP_COOKIE"].substr(equal + 1, offset - equal - 1));
+          if (offset == Rafale::serverDatas["HTTP_COOKIE"].size())
+            break;
+          offset += 2;
+        }
     }
 }
 
@@ -183,18 +192,79 @@ std::string    SetCookies()
   return result;
 }
 
+int remove_directory(const char *path)
+{
+   DIR *d = opendir(path);
+   size_t path_len = strlen(path);
+   int r = -1;
+
+   if (d)
+   {
+      struct dirent *p;
+
+      r = 0;
+
+      while (!r && (p=readdir(d)))
+      {
+          int r2 = -1;
+          char *buf;
+          size_t len;
+
+          /* Skip the names "." and ".." as we don't want to recurse on them. */
+          if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, ".."))
+          {
+             continue;
+          }
+
+          len = path_len + strlen(p->d_name) + 2;
+          buf = (char*)malloc(len);
+
+          if (buf)
+          {
+             struct stat statbuf;
+
+             snprintf(buf, len, "%s/%s", path, p->d_name);
+
+             if (!stat(buf, &statbuf))
+             {
+                if (S_ISDIR(statbuf.st_mode))
+                {
+                   r2 = remove_directory(buf);
+                }
+                else
+                {
+                   r2 = unlink(buf);
+                }
+             }
+
+             free(buf);
+          }
+
+          r = r2;
+      }
+
+      closedir(d);
+   }
+
+   if (!r)
+   {
+      r = rmdir(path);
+   }
+
+   return r;
+}
+
 int main(void)
 {
   srand(static_cast<unsigned int>(time(0)) * getpid());
   Rafale::tmpDirectory = "/tmp/rafale"; // + Rafale::ToString(rand())
   Rafale::filesDirectory = Rafale::tmpDirectory + "/files";
   Rafale::sessionsDirectory = Rafale::tmpDirectory + "/sessions";
-  unlink(Rafale::tmpDirectory.c_str());
+
+  remove_directory(Rafale::tmpDirectory.c_str());
   mkdir(Rafale::tmpDirectory.c_str(), 0700);
-  unlink(Rafale::filesDirectory.c_str());
-  mkdir(Rafale::filesDirectory.c_str(), 0700);
-  unlink(Rafale::sessionsDirectory.c_str());
   mkdir(Rafale::sessionsDirectory.c_str(), 0700);
+  mkdir(Rafale::filesDirectory.c_str(), 0700);
   while(FCGI_Accept() >= 0)
     {
       try {
@@ -203,18 +273,19 @@ int main(void)
         Rafale::Controller    *p = Caller::Make(dispatcher.Controller());
 
         GetServerData();
-        SetContent();
         GetGetData();
-        GetPostData();
         GetCookies();
+        SetContent();
+        GetPostData();
         std::string data = p->Action(dispatcher.Action());
         FCGI_printf("%s", SetCookies().c_str());
         FCGI_printf("Content-type: text/html\r\n\r\n");
+        // FCGI_printf("DEBUG=%s<br />", getenv("CONTENT_LENGTH"));
         FCGI_printf("%s", data.c_str());
         delete p;
         Rafale::serverDatas.clear();
-        Rafale::postDatas.clear();
         Rafale::getDatas.clear();
+        Rafale::postDatas.clear();
         Rafale::cookies.clear();
         Rafale::files.clear();
         Rafale::Session::Clean();
@@ -223,5 +294,5 @@ int main(void)
         std::cerr << s << std::endl;
       }
     }
-  unlink(Rafale::tmpDirectory.c_str()); // CATCH SIGNAL TO DO THIS
+  // unlink(Rafale::tmpDirectory.c_str()); // CATCH SIGNAL TO DO THIS
 }

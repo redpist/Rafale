@@ -2,6 +2,13 @@
 #include <cstdint>
 #include <sstream>
 #include <string>
+#include <fstream>
+
+bool    Rafale::Exist(const std::string &fileName)
+{
+  std::ifstream f(fileName);
+  return f.is_open();
+}
 
 std::string Rafale::Replace(const std::string &str, const std::string &token, const std::string &newToken)
 {
@@ -31,9 +38,9 @@ std::string Rafale::DeleteEOS(const std::string &str)
   return newContent;
 }
 
-std::string   &Rafale::ToLower(std::string &value)
+std::string   Rafale::ToLower(const std::string &value)
 {
-  for (char &c: value)
+  for (char c: value)
     {
       if (c >= 'A' && c <= 'Z')
         c += ('a' - 'A');

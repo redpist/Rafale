@@ -29,6 +29,7 @@
 
 #include <list>
 #include <fstream>
+#include <string>
 #include "config.hh"
 #include "sql/tools.hh"
 
@@ -36,6 +37,76 @@ namespace Rafale
 {
   namespace SQL
   {
+    namespace Internal_
+    {
+      inline std::string EscapeSpecialChar(const std::string& buffer)
+      {
+        std::string result;
+        for (auto it = begin(buffer); it != end(buffer); ++it)
+          {
+            switch (*it)
+              {
+              case '\\':
+                result += "\\\\";
+                break;
+              case '\'':
+                result += "\\\'";
+                break;
+              default:
+                result += *it;
+                break;
+              }
+          }
+        return result;
+      }
+    }
+
+    inline std::string Password(const std::string &str)
+    {
+      sql::Driver                         *driver =sql::mysql::get_driver_instance() ;
+      std::unique_ptr<sql::Connection>    connection;
+      std::unique_ptr<sql::Statement>     statement;
+      std::string dataBase;
+      std::string host;
+      std::string user;
+
+
+      // std::ofstream outputFile("/var/log/rafale/query.log"); // LOGS
+
+      host = Rafale::config["db.host"];
+      if (!host.size())
+        {
+          //todo erreur no db.host section in config.cc
+        }
+
+      user = Rafale::config["db.user"];
+      if (!user.size())
+        {
+          //todo erreur no db.user section in config.cc
+        }
+
+      std::string password = Rafale::config["db.password"];
+      if (!password.size())
+        {
+          //todo erreur no db.password section in config.cc
+        }
+
+      connection = std::unique_ptr<sql::Connection>(driver->connect(host, user, password));
+      statement = std::unique_ptr<sql::Statement>(connection->createStatement());
+
+      dataBase = Rafale::config["db.database"];
+      if (!dataBase.size())
+        {
+          //todo erreur no db.database section in config.cc
+        }
+      std::string       sql;
+      sql = "SELECT PASSWORD('" + Internal_::EscapeSpecialChar(str) + "')";
+      std::unique_ptr<sql::ResultSet>  res(statement->executeQuery(sql));
+      if (res->next())
+        return res->getString(1);
+      return "";
+    }
+
     template <class CurrentModel>
     std::shared_ptr<std::list<CurrentModel>>    Query(const std::map<std::string, Rafale::SQL::Data<Rafale::SQL::Raw> > &where)
     {
@@ -106,7 +177,6 @@ namespace Rafale
       //   {
       //     outputFile << "Query: " << sql << std::endl;
       //   }
-
       std::shared_ptr<std::list<CurrentModel>> result(new std::list<CurrentModel>());
       std::unique_ptr<sql::ResultSet>  res(statement->executeQuery(sql));
       while (res->next())

@@ -84,6 +84,16 @@ namespace Rafale
       return name_;
     }
 
+    std::string Extension()
+    {
+      if ((name_.rfind(".") != std::string::npos) && name_.rfind(".") &&
+          ((name_.rfind(".") != (name_.size() - 1))))
+        return name_.substr(name_.rfind(".") + 1);
+      else
+        return "";
+    }
+
+
     ~File()
     {
       if (!empty_)
