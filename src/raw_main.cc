@@ -280,7 +280,6 @@ int main(void)
         std::string data = p->Action(dispatcher.Action());
         FCGI_printf("%s", SetCookies().c_str());
         FCGI_printf("Content-type: text/html\r\n\r\n");
-        // FCGI_printf("DEBUG=%s<br />", getenv("CONTENT_LENGTH"));
         FCGI_printf("%s", data.c_str());
         delete p;
         Rafale::serverDatas.clear();
