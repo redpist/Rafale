@@ -272,6 +272,7 @@ int main(void)
 
         Rafale::Controller    *p = Caller::Make(dispatcher.Controller());
 
+        Rafale::Session::Clean();
         GetServerData();
         GetGetData();
         GetCookies();
@@ -287,7 +288,6 @@ int main(void)
         Rafale::postDatas.clear();
         Rafale::cookies.clear();
         Rafale::files.clear();
-        Rafale::Session::Clean();
       }
       catch(const char*s) {
         std::cerr << s << std::endl;

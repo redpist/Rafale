@@ -77,19 +77,20 @@ namespace Rafale
       if (Rafale::cookies["sessionid"].Value().size()
           && Session::sessionMap_.find(Rafale::cookies["sessionid"].Value()) != end(Session::sessionMap_))
         {
-          auto it = Session::sessionMap_.find(Rafale::cookies["sessionid"].Value());
-          it->second->Load();
-          return *(it->second);
+          if (Session::sessionMap_[Rafale::cookies["sessionid"].Value()])
+            {
+              auto it = Session::sessionMap_.find(Rafale::cookies["sessionid"].Value());
+              it->second->Load();
+              return *(it->second);
+            }
+          Rafale::serverDatas["SESSION_EXPIRE"] = "true";
         }
-      else
-        {
-          std::string id = Rafale::ToString(rand()) + Rafale::ToString(rand()) + Rafale::ToString(rand());
-          Rafale::cookies["sessionid"] = id;
-          time_t expire = time(0) + 1800;
-          auto session = sessions_.insert(std::pair<time_t, Session>(expire, Session(id, expire)));
-          sessionMap_.insert(std::pair<std::string, Session*>(id, &(session.first->second)));
-          return session.first->second;
-        }
+      std::string id = Rafale::ToString(rand()) + Rafale::ToString(rand()) + Rafale::ToString(rand());
+      Rafale::cookies["sessionid"] = id;
+      time_t expire = time(0) + 1800;
+      auto session = sessions_.insert(std::pair<time_t, Session>(expire, Session(id, expire)));
+      sessionMap_.insert(std::pair<std::string, Session*>(id, &(session.first->second)));
+      return session.first->second;
     }
 
     static void Clean()
