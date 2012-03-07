@@ -4,6 +4,11 @@
 #include <string>
 #include <fstream>
 
+time_t        Rafale::Now()
+{
+  return time(0);
+}
+
 bool    Rafale::Exist(const std::string &fileName)
 {
   std::ifstream f(fileName);

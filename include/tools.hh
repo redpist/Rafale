@@ -30,9 +30,12 @@
 #include <string>
 #include <sstream>
 #include <assert.h>
+#include <ctime>
 
 namespace Rafale
 {
+  time_t        Now();
+
   std::string UriDecode(const std::string & sSrc);
   std::string UriEncode(const std::string & sSrc);
 

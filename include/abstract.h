@@ -6,16 +6,22 @@
 #include <vector>
 #include <ctime>
 #include <cstring>
+#include "tools.hh"
 
 namespace Rafale
 {
   class DateTime
   {
   public:
+
     DateTime(const std::string &dateTime, const std::string &format = "%Y-%m-%d %H:%M:%S") : tm_(), isValid_(false)
     {
       if (strptime(dateTime.c_str(), format.c_str(), &tm_))
         isValid_ = true;
+    }
+
+    DateTime(const time_t &time = Rafale::Now()) : tm_(*localtime(&time))
+    {
     }
 
     bool        IsValid()

@@ -41,7 +41,7 @@ namespace Rafale
         integer,
         floating,
         boolean,
-        // dateTime,
+        dateTime,
         string,
       };
 
@@ -96,6 +96,15 @@ namespace Rafale
         static constexpr SQL::Type Type()
         {
           return SQL::floating;
+        }
+      };
+
+      template <class ChildModel>
+      struct TypeToEnum<ChildModel, Rafale::DateTime ChildModel::*>
+      {
+        static constexpr SQL::Type Type()
+        {
+          return SQL::dateTime;
         }
       };
 
@@ -155,6 +164,15 @@ namespace Rafale
         }
       };
 
+      template <>
+      struct TypeToEnum<Raw, Rafale::DateTime>
+      {
+        static constexpr SQL::Type Type()
+        {
+          return SQL::dateTime;
+        }
+      };
+
 
       // --------------------------
 
@@ -165,7 +183,7 @@ namespace Rafale
         int             (ChildModel::*integer);
         bool            (ChildModel::*boolean);
         float           (ChildModel::*floating);
-        // DateTime        *dateTime;
+        Rafale::DateTime          (ChildModel::*dateTime);
       };
 
       template <>
@@ -175,6 +193,7 @@ namespace Rafale
         int             integer;
         bool            boolean;
         float           floating;
+        Rafale::DateTime        *dateTime;
       };
 
       // --------------------------
@@ -230,6 +249,17 @@ namespace Rafale
         }
       };
 
+
+      template <class ChildModel>
+      struct Assign<ChildModel, Rafale::DateTime (ChildModel::*)>
+      {
+        Assign(BasicData<ChildModel> &data_, Rafale::DateTime ChildModel::*dateTime)
+        {
+          data_.dateTime = dateTime;
+        }
+      };
+
+
       // With Raw Data (pointer to none pod (no enought with c++0x) and data for pod)
       template <>
       struct Assign<Raw, const String &>
@@ -284,6 +314,25 @@ namespace Rafale
           data_.floating = floating;
         }
       };
+
+      template <>
+      struct Assign<Raw, const DateTime &>
+      {
+        Assign(BasicData<Raw> &data_, const DateTime &dateTime)
+        {
+          data_.dateTime = new DateTime(dateTime);
+        }
+      };
+
+      template <>
+      struct Assign<Raw, DateTime>
+      {
+        Assign(BasicData<Raw> &data_, const DateTime &dateTime)
+        {
+          data_.dateTime = new DateTime(dateTime);
+        }
+      };
+
 
     }
 
@@ -348,6 +397,10 @@ namespace Rafale
             return '\'' + EscapeSpecialChar(ptr->*(data_.string)) + '\'';
             break;
 
+          case SQL::dateTime:
+            return '\'' + EscapeSpecialChar((ptr->*(data_.dateTime)).ToString()) + '\'';
+            break;
+
           default:
             return "";
             break;
@@ -388,6 +441,17 @@ namespace Rafale
           }
         return false;
       }
+
+      bool      Set(ChildModel &ptr, const Rafale::DateTime &value)
+      {
+        if (Type() == SQL::dateTime)
+          {
+            ptr.*(data_.dateTime) = value;
+            return true;
+          }
+        return false;
+      }
+
 
       bool      Set(ChildModel &ptr, const char *value)
       {
@@ -450,6 +514,16 @@ namespace Rafale
         return false;
       }
 
+      bool      Set(ChildModel *ptr, const DateTime &value)
+      {
+        if (Type() == SQL::dateTime)
+          {
+            ptr->*(data_.dateTime) = value;
+            return true;
+          }
+        return false;
+      }
+
     private:
       template <typename T>
       void      SetData_(T data)
@@ -483,9 +557,9 @@ namespace Rafale
             data_.string = new String(*other.data_.string);
             break;
 
-          // case SQL::dateTime:
-          //   delete data_.dateTime;
-          //   break;
+          case SQL::dateTime:
+            data_.dateTime = new Rafale::DateTime(*other.data_.dateTime);
+            break;
 
           default:
             break;
@@ -501,9 +575,9 @@ namespace Rafale
             delete data_.string;
             break;
 
-          // case SQL::dateTime:
-          //   delete data_.dateTime;
-          //   break;
+          case SQL::dateTime:
+            delete data_.dateTime;
+            break;
 
           default:
             break;
@@ -553,6 +627,10 @@ namespace Rafale
 
           case SQL::string:
             return '\'' + EscapeSpecialChar(*(data_.string)) + '\'';
+            break;
+
+          case SQL::dateTime:
+            return '\'' + EscapeSpecialChar(data_.dateTime->ToString()) + '\'';
             break;
 
           default:
