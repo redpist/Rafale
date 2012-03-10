@@ -46,16 +46,16 @@ public:
           std::cout << "<tr><td>" << var.first << "</td><td>" << var.second << "</td></tr>" << std::endl;
       }
     std::cout << "</tbody></table>" << std::endl;
-    // std::cout << "<br />\nFILES ::<br />" << std::endl;
-    // std::cout << "<table border=\"1\">\n"
-    //   "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
-    //   "<tbody>";
-    // for (auto var: Rafale::files)
-    //   {
-    //     std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Name() << "</td></tr>" << std::endl;
-    //     var.second.Copy("/var/www/lol/static/test/" + var.second.Name());
-    //   }
-    // std::cout << "</tbody></table>" << std::endl;
+    std::cout << "<br />\nFILES ::<br />" << std::endl;
+    std::cout << "<table border=\"1\">\n"
+      "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
+      "<tbody>";
+    for (auto var: Rafale::files)
+      {
+        std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Name() << "</td></tr>" << std::endl;
+        var.second.Copy("/var/www/lol/static/test/" + var.second.Name());
+      }
+    std::cout << "</tbody></table>" << std::endl;
 
     std::cout << "<br />\nCOOKIES ::<br />" << std::endl;
     std::cout << "<table border=\"1\">\n"
@@ -63,29 +63,29 @@ public:
       "<tbody>";
     for (auto var: Rafale::cookies)
       {
-        std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Value() << "</td></tr>" << std::endl;
+        std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Value() << "</td></tr>" << std::endl;cd ..
       }
     std::cout << "</tbody></table>" << std::endl;
 
 
-    // Rafale::cookies["PetitCookieDeTest0"] = "l'ancien contenu du PetitCookieDeTest1 est {" +
-    //   Rafale::cookies["PetitCookieDeTest1"].Value() + "}";
-    // Rafale::cookies["PetitCookieDeTest1"] = "le timestamp actuel est " + Rafale::ToString(time(0));
+    Rafale::cookies["PetitCookieDeTest0"] = "l'ancien contenu du PetitCookieDeTest1 est {" +
+      Rafale::cookies["PetitCookieDeTest1"].Value() + "}";
+    Rafale::cookies["PetitCookieDeTest1"] = "le timestamp actuel est " + Rafale::ToString(time(0));
 
-    // Rafale::Session &session = Rafale::Session::Get();
+    Rafale::Session &session = Rafale::Session::Get();
 
-    // std::cout << "<br />\nSESSIONS ::<br />" << std::endl;
-    // std::cout << "<table border=\"1\">\n"
-    //   "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
-    //   "<tbody>";
-    // for (auto &var: session.Datas())
-    //   {
-    //     std::cout << "<tr><td>" << var.first << "</td><td>" << var.second << "</td></tr>" << std::endl;
-    //   }
-    // std::cout << "</tbody></table>" << std::endl;
+    std::cout << "<br />\nSESSIONS ::<br />" << std::endl;
+    std::cout << "<table border=\"1\">\n"
+      "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
+      "<tbody>";
+    for (auto &var: session.Datas())
+      {
+        std::cout << "<tr><td>" << var.first << "</td><td>" << var.second << "</td></tr>" << std::endl;
+      }
+    std::cout << "</tbody></table>" << std::endl;
 
 
-    // session["TEST"] = "Hey Ho ! Timestamp=" + Rafale::ToString(time(0));
+    session["TEST"] = "Hey Ho ! Timestamp=" + Rafale::ToString(time(0));
   }
 
   view upload
