@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <dirent.h>
+#include <clocale>
 
 namespace Rafale
 {
@@ -168,7 +169,6 @@ void    GetCookies()
       std::size_t prevOffset = 0;
       for (std::size_t offset = 2; (offset = Rafale::serverDatas["HTTP_COOKIE"].find("; ", offset)); prevOffset = offset)
         {
-          
           if (offset == std::string::npos)
             offset = Rafale::serverDatas["HTTP_COOKIE"].size();
           std::size_t equal = Rafale::serverDatas["HTTP_COOKIE"].find("=", prevOffset);
@@ -265,6 +265,9 @@ int main(void)
   mkdir(Rafale::tmpDirectory.c_str(), 0700);
   mkdir(Rafale::sessionsDirectory.c_str(), 0700);
   mkdir(Rafale::filesDirectory.c_str(), 0700);
+  std::setlocale(LC_ALL, "fr_FR.UTF-8");
+  std::setlocale(LC_NUMERIC, "fr_FR.UTF-8");
+  std::setlocale(LC_TIME, "fr_FR.UTF-8");
   while(FCGI_Accept() >= 0)
     {
       try {

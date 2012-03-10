@@ -202,6 +202,10 @@ namespace Rafale
                 member.second.Set(model, res->getString(member.first));
                 break;
 
+              case SQL::dateTime:
+                member.second.Set(model, Rafale::DateTime(res->getString(member.first)));
+                break;
+
               default:
                 break;
               }
