@@ -422,6 +422,16 @@ namespace Rafale
         return false;
       }
 
+      bool      Set(ChildModel &ptr, bool value)
+      {
+        if (Type() == SQL::boolean)
+          {
+            ptr.*(data_.boolean) = value;
+            return true;
+          }
+        return false;
+      }
+
       bool      Set(ChildModel &ptr, float value)
       {
         if (Type() == SQL::floating)

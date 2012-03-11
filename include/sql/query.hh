@@ -191,7 +191,7 @@ namespace Rafale
                 break;
 
               case SQL::boolean:
-                member.second.Set(model, res->getInt(member.first));
+                member.second.Set(model, static_cast<bool>(res->getInt(member.first)));
                 break;
 
               case SQL::floating:
