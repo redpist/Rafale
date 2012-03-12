@@ -18,4 +18,7 @@ a.out
 #no more object file
 *.o
 
-example/generated/*
+example/build
+example/rafale.fcgi
+example/rafale.fcgi.pid
+example/config/vhost.nginx.conf

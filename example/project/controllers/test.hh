@@ -63,7 +63,7 @@ public:
       "<tbody>";
     for (auto var: Rafale::cookies)
       {
-        std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Value() << "</td></tr>" << std::endl;cd ..
+        std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Value() << "</td></tr>" << std::endl;
       }
     std::cout << "</tbody></table>" << std::endl;
 
