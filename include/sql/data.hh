@@ -405,6 +405,7 @@ namespace Rafale
             return "";
             break;
           }
+        return "";
       }
 
       SQL::Type   Type() const
@@ -647,6 +648,7 @@ namespace Rafale
             return "";
             break;
           }
+            return "";
       }
 
       SQL::Type   Type() const

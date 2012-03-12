@@ -20,39 +20,37 @@
 
 namespace Rafale
 {
-  template <class ChildModel>
-  class Model
+  class BasicModel
   {
   protected:
-    Model() : driver_(sql::mysql::get_driver_instance())
+    BasicModel()
     {
-      host_ = Rafale::config["db.host"];
-      if (!host_.size())
-        {
-         //todo erreur no db.host section in config.cc
-        }
+    }
+  public:
+    static void        UseDatabase()
+    {
+      Rafale::BasicModel::con_.reset();
+      Rafale::BasicModel::con_ = std::shared_ptr<sql::Connection>(driver_->connect(Rafale::BasicModel::host_, Rafale::BasicModel::user_, Rafale::BasicModel::password_));
+      std::shared_ptr<sql::Statement> stmt = std::unique_ptr<sql::Statement>(BasicModel::con_->createStatement());
+      stmt->execute("USE `" + BasicModel::dataBase_ + "`");
+    }
+  protected:
+    static sql::Driver                         *driver_;
+    static std::shared_ptr<sql::Connection>    con_;
+    static std::string dataBase_;
+    static std::string host_;
+    static std::string user_;
+  private:
+    static std::string password_;
+  };
 
-      user_ = Rafale::config["db.user"];
-      if (!user_.size())
-        {
-         //todo erreur no db.user section in config.cc
-        }
-
-      std::string password = Rafale::config["db.password"];
-      if (!password.size())
-        {
-         //todo erreur no db.password section in config.cc
-        }
-
-      con_ = std::unique_ptr<sql::Connection>(driver_->connect(host_, user_, password));
-      stmt_ = std::unique_ptr<sql::Statement>(con_->createStatement());
-
-      dataBase_ = Rafale::config["db.database"];
-      if (!dataBase_.size())
-        {
-         //todo erreur no db.database section in config.cc
-        }
-      stmt_->execute("USE `" + dataBase_ + "`");
+  template <class ChildModel>
+  class Model : public BasicModel
+  {
+  protected:
+    Model()
+    {
+      stmt_ = std::unique_ptr<sql::Statement>(BasicModel::con_->createStatement());
     }
 
     ~Model()
@@ -211,14 +209,9 @@ namespace Rafale
 
   typedef std::shared_ptr<std::list<ChildModel> >     List;
 
-  private:
-    sql::Driver                         *driver_;
-    std::shared_ptr<sql::Connection>    con_;
-    std::shared_ptr<sql::Statement>     stmt_;
   protected:
+    std::shared_ptr<sql::Statement>     stmt_;
     std::string dataBase_;
-    std::string host_;
-    std::string user_;
   };
 }
 

@@ -254,6 +254,14 @@ int remove_directory(const char *path)
    return r;
 }
 
+sql::Driver *Rafale::BasicModel::driver_  = sql::mysql::get_driver_instance();
+std::string Rafale::BasicModel::host_ = Rafale::config["db.host"];
+std::string Rafale::BasicModel::user_ = Rafale::config["db.user"];
+std::string Rafale::BasicModel::dataBase_ = Rafale::config["db.database"];
+std::string Rafale::BasicModel::password_ = Rafale::config["db.password"];
+
+std::shared_ptr<sql::Connection>    Rafale::BasicModel::con_;
+
 int main(void)
 {
   srand(static_cast<unsigned int>(time(0)) * getpid());
@@ -281,6 +289,7 @@ int main(void)
         GetCookies();
         SetContent();
         GetPostData();
+        Rafale::BasicModel::UseDatabase();
         std::string data = p->Action(dispatcher.Action());
         FCGI_printf("%s", SetCookies().c_str());
         FCGI_printf("Content-type: text/html\r\n\r\n");
@@ -294,6 +303,11 @@ int main(void)
       }
       catch(const char*s) {
         std::cerr << s << std::endl;
+      }
+      catch(sql::SQLException excep) {
+        std::ofstream log("/var/log/rafale/sql.log");
+        if (log.is_open())
+          log << excep.what();
       }
     }
   // unlink(Rafale::tmpDirectory.c_str()); // CATCH SIGNAL TO DO THIS
