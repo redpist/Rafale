@@ -21,4 +21,5 @@ a.out
 example/build
 example/rafale.fcgi
 example/rafale.fcgi.pid
+example/project/config.cc
 example/config/vhost.nginx.conf
