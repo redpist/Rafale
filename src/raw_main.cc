@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <clocale>
+#include <fstream>
 
 namespace Rafale
 {
@@ -265,14 +266,16 @@ std::shared_ptr<sql::Connection>    Rafale::BasicModel::con_;
 int main(void)
 {
   srand(static_cast<unsigned int>(time(0)) * getpid());
+  if (!Rafale::Exist("/var/log/rafale"))
+    mkdir("/var/log/rafale", 0770);
   Rafale::tmpDirectory = "/tmp/rafale"; // + Rafale::ToString(rand())
   Rafale::filesDirectory = Rafale::tmpDirectory + "/files";
   Rafale::sessionsDirectory = Rafale::tmpDirectory + "/sessions";
 
   remove_directory(Rafale::tmpDirectory.c_str());
-  mkdir(Rafale::tmpDirectory.c_str(), 0700);
-  mkdir(Rafale::sessionsDirectory.c_str(), 0700);
-  mkdir(Rafale::filesDirectory.c_str(), 0700);
+  mkdir(Rafale::tmpDirectory.c_str(), 0770);
+  mkdir(Rafale::sessionsDirectory.c_str(), 0770);
+  mkdir(Rafale::filesDirectory.c_str(), 0770);
   std::setlocale(LC_ALL, "fr_FR.UTF-8");
   std::setlocale(LC_NUMERIC, "fr_FR.UTF-8");
   std::setlocale(LC_TIME, "fr_FR.UTF-8");
@@ -305,9 +308,10 @@ int main(void)
         std::cerr << s << std::endl;
       }
       catch(sql::SQLException excep) {
-        std::ofstream log("/var/log/rafale/sql.log");
+        std::fstream  log;
+        log.open("/var/log/rafale/sql.log", std::fstream::out | std::fstream::app);
         if (log.is_open())
-          log << excep.what();
+          log << excep.what() << std::endl;
       }
     }
   // unlink(Rafale::tmpDirectory.c_str()); // CATCH SIGNAL TO DO THIS

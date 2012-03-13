@@ -74,7 +74,7 @@ inCplusplus:
 
   void  PrintHtml(const std::string& buffer)
   {
-    (*outputFile_) << "std::cout << \"" << EscapeSpecialChar(buffer) << "\";";
+    (*outputFile_) << "std::cout << \"" << EscapeSpecialChar(buffer) << "\";\n";
   }
 
   void  PrintCPlusPlus(const std::string& buffer)
