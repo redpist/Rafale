@@ -14,15 +14,12 @@ BUILD_DIR=build
 FCGI_DESTINATION=.
 
 echo "########################### Staging project into build ###########################"
-rm -rf "$BUILD_DIR"/
+rm -rf "$BUILD_DIR"
 cp -r "$SOURCE_DIR" "$BUILD_DIR"
 mkdir -p "$BUILD_DIR/generated/models"
 echo "############################### Generating project ###############################"
 cd "$BUILD_DIR"
 $RAFALE_GENERATOR .
-cd -
-echo "################################ Building project ################################"
-cd "$BUILD_DIR"
 make
 cd -
 echo "################################### Moving FCGI ##################################"
