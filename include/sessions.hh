@@ -81,6 +81,7 @@ namespace Rafale
             {
               auto it = Session::sessionMap_.find(Rafale::cookies["sessionid"].Value());
               it->second->Load();
+              it->second->expire_ = time(0) + 1800;
               return *(it->second);
             }
           Rafale::serverDatas["SESSION_EXPIRE"] = "true";
