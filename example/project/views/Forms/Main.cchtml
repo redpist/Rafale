@@ -1,0 +1,2 @@
+<h2>Hello ! I CAN HAZ A FORM ?</h2>
+<c++>  std::cout << form.render() << std::endl; </c++>

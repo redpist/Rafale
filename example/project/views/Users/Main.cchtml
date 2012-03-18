@@ -1,2 +1,0 @@
-Hello !
-<c++>  std::cout << form.print() << std::endl; </c++>
