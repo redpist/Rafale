@@ -29,6 +29,7 @@ div.form-subitem label { display: inline; font-size: 14px; }
 
 
 input, select, textarea { border: 1px solid #999; }
+input.error, select.error, textarea.error { border: 1px solid #f55; }
 input[type="textfield"], input[type="file"], input[type="password"], textarea { padding: 5px; width: 320px; }
 select { width: 330px; }
 textarea { font-family: Lucida console, Lucida, Monaco; min-height: 100px;}
