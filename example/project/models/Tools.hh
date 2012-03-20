@@ -4,6 +4,7 @@
 
 #ifndef _TOOLS_HH_
 # define _TOOLS_HH_ 
+# include "Rafale.h"
 
 class Tools {
   public:
