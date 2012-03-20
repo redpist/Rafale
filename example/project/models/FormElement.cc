@@ -46,12 +46,6 @@ namespace Forms {
   void  MultipleInput::addOption(const std::string& key, const std::string &value) { this->_opts[key] = value; }
   void  MultipleInput::setOptions(const Forms::AttrMap &opts) { for (auto p: opts) { this->_opts[p.first] = p.second; } }
   void  MultipleInput::removeOption(const std::string& key) { this->_opts.erase(key); }
-  ErrorList  MultipleInput::validate(const std::map<std::string, std::string> &values) {
-    ErrorList e;
-    return e;
-  //  return {{this->_data["name"], values.at(this->_data["name"])}};
-  }
-
 
 /*****************************************************
  * LabeledInput FormElements                         *

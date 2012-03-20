@@ -46,7 +46,6 @@ namespace Forms {
     virtual void      addOption(const std::string& key, const std::string &value);
     virtual void      setOptions(const Forms::AttrMap &opts);
     virtual void      removeOption(const std::string& key);
-    virtual ErrorList validate(const std::map<std::string, std::string> &values);
   protected:
     Forms::AttrMap  _opts;
   };

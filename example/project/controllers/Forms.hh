@@ -60,7 +60,7 @@ public:
     view.form.addElement(new Forms::Submit("action", {
       {"value", "Envoie la purée Jeanine"}
     }));
-    if (!Rafale::postDatas.empty()) {
+    if (Rafale::postDatas["action"] != "") {
       Forms::ErrorList list = view.form.validate(Rafale::postDatas);
       if (!list.empty())
         view.formErrors = Forms::Form::errorListToJSON(list);
