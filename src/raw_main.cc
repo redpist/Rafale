@@ -283,7 +283,6 @@ int main(void)
     {
       try {
         Dispatcher dispatcher(getenv("SCRIPT_FILENAME"));
-
         Rafale::Controller    *p = Caller::Make(dispatcher.Controller());
 
         Rafale::Session::Clean();
