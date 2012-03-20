@@ -4,9 +4,13 @@
 # include "Tools.hh"
 
 namespace Forms {
+  class FormElement;
   typedef std::list<std::pair<std::string, std::string> >             ErrorList;
   typedef std::initializer_list<std::pair<std::string, std::string> > InitMap;
   typedef std::map<std::string, std::string>                          AttrMap;
+  typedef std::string (*FormValidator)(FormElement *, const std::map<std::string, std::string> &);
+  
+
   /*****************************************************
    * Abstract FormElement Class                        *
    *****************************************************/
@@ -24,14 +28,26 @@ namespace Forms {
     };
     virtual ~FormElement() {};
     virtual void  setData(const std::string &key, const std::string &value) { this->_data[key] = value; } 
-    virtual void  setDatas(const Forms::InitMap &data) { for (auto p: data) { this->_data[p.first] = p.second; } };
-    virtual void  setDatas(const Forms::AttrMap &data) { for (auto p: data) { this->_data[p.first] = p.second; } };
+    virtual void  setDatas(const Forms::InitMap &data) { for (auto p: data) { this->setData(p.first, p.second); } };
+    virtual void  setDatas(const Forms::AttrMap &data) { for (auto p: data) { this->setData(p.first, p.second); } };
     virtual const std::string& getData(const std::string &key) { return this->_data[key]; };
+    virtual void  addValidators(std::list<FormValidator> v) { for (auto p: v) { this->addValidator(p); } };
+    virtual void  addValidators(std::initializer_list<FormValidator> v) { for (auto p: v) { this->addValidator(p); } };
+    virtual void  addValidator(FormValidator v) { this->_validators.push_back(v); }
     virtual std::string render() = 0;
-    virtual Forms::ErrorList validate() { return {{this->_data["id"], Rafale::postDatas[this->_data["name"]]}}; };
+    virtual Forms::ErrorList validate(const std::map<std::string, std::string> &values) { 
+      std::string msg;
+      Forms::ErrorList e;
+      for (auto v: this->_validators) {
+        if ((msg = v(this, values)) != "") 
+          e.push_back({this->_data["id"], msg});
+      }
+      return e;
+    };
 
   protected:
-    Forms::AttrMap  _data;
+    Forms::AttrMap            _data;
+    std::list<FormValidator>  _validators;
   };
 
   /*****************************************************

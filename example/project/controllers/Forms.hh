@@ -6,6 +6,7 @@
 #include <list>
 #include "models/Form.hh"
 #include "models/FormElement.hh"
+#include "models/FormValidators.hh"
 
 controller Forms
 {
@@ -27,6 +28,7 @@ public:
       {"title", "Secret"},
       {"description", "This is super secret !"}
     }));
+    view.form["password"]->addValidator(Forms::Validators::Required);
     view.form.addElement(new Forms::Select("wish", {
       {"title", "Plus tard je veux devenir :"},
       {"description", "On ne triche pas !"},
@@ -60,7 +62,7 @@ public:
       {"value", "Envoie la purée Jeanine"}
     }));
     if (!Rafale::postDatas.empty()) {
-      Forms::ErrorList list = view.form.validate();
+      Forms::ErrorList list = view.form.validate(Rafale::postDatas);
       if (!list.empty())
         view.formErrors = Forms::Form::errorListToJSON(list);
     }

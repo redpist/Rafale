@@ -24,18 +24,18 @@ namespace Forms {
 
     std::string render() {
       std::string output;
-      output += "<form "+Tools::buidlAttributes(this->_data)>+"\n";
+      output += "<form "+Tools::buidlAttributes(this->_data)+">\n";
       for (auto e: this->_elements)
         output += "<div id=\"form-"+e.first+"\" class=\"form-item\">"+e.second->render()+"</div>\n";
       output += "</form>\n";
       return output;
     }
 
-    ErrorList validate() {
+    ErrorList validate(const std::map<std::string, std::string> &values) {
       ErrorList errors;
       ErrorList _errors;
       for (auto e: this->_elements) {
-        _errors = e.second->validate();
+        _errors = e.second->validate(values);
         errors.merge(_errors);
       }
       return errors;
