@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ADDRESS=127.0.0.1
-PORT=9042
+PORT=9007
 #USER=www-data
 #GROUP=www-data
 CGI_FILE="./rafale.fcgi"

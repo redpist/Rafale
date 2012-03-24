@@ -1,6 +1,66 @@
 <h2>Hello ! I CAN HAZ A FORM ?</h2>
-<c++>  std::cout << form.render() << std::endl; </c++>
+<div id="form">
+  <c++>  std::cout << form.render() << std::endl; </c++>
+</div>
+<div id="code" class="cpp">
+  <pre class="cpp"><code class="cpp">
+std::string sheep = "            __  _         \n"
+                    "        .-:'  `; `-._     \n"
+       	            "       (_,           )    \n"
+		    "     ,'o\"(            )> \n"
+		    "    (__,-'            )   \n"
+		    "       (             )    \n"
+		    "        `-'._.--._.-'     \n"
+		    "           |||  |||     ";
+view.form.setData("id", "example");
+view.form.addElement(new Forms::Textfield("mail", {
+  {"title", "Mail"},
+  {"description", "Ex: nom.prenom@domaine.fr"},
+  {"value", Rafale::postDatas["mail"]}
+}))->addValidator(Forms::Validators::isNumeric);
+
+view.form.addElement(new Forms::Password("password", {
+  {"title", "Secret"},
+  {"description", "This is super secret !"},
+  {"value", Rafale::postDatas["password"]}
+ }))
+view.form["password"]->addValidator(Forms::Validators::isRequired);
+
+view.form.addElement(new Forms::Select("wish", {
+  {"title", "Plus tard je veux devenir :"},
+  {"description", "On ne triche pas !"},
+  {"multiple", "true"},
+  {"value", "Une Poule"},
+}, {
+  {"Une Poule", "1"}, 
+  {"Un Canard", "2"},
+  {"Une Oie", "3"}, 
+  {"Un Faisan", "4"}
+}));
+view.form.addElement(new Forms::Radios("random", {
+  {"title", "Choisis un nombre entre 10 et 50"},
+  {"description", "Question anti-robot"},
+  {"value", "B"}
+}, {
+  {"B", "B"},
+  {"5", "5"},
+  {"Over 9000", "9000"}
+}));
+view.form.addElement(new Forms::Textarea("random", {
+  {"title", "Dessine moi un mouton"},
+  {"description", "ASCII art FTW !"},
+  {"value", (Rafale::postDatas["random"] != "" ? 
+    Rafale::postDatas["random"] : sheep)})));
+view.form.addElement(new Forms::Submit("action", {
+  {"value", "Envoie la purée Jeanine"}
+}));
+if (!Rafale::postDatas.empty()) {
+  Forms::ErrorList list = view.form.validate(Rafale::postDatas);
+  if (!list.empty())
+    view.formErrors = Forms::Form::errorListToJSON(list);
+}
+</code></pre>
+</div>
 <script type="text/javascript">
 <c++> if (formErrors != "") { std::cout << "var formErrors = " << formErrors << ";" << std::endl; }</c++>
-<c++> std::cout << Rafale::postDatas["wish"] << std::endl; </c++>
 </script>
