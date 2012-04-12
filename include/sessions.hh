@@ -111,36 +111,43 @@ namespace Rafale
   private:
     void        Save()
     {
-      std::ofstream tmpFile(Rafale::sessionsDirectory + "/_session_" + id_);
-      if (tmpFile.is_open())
+      if (!saveUpToDate_ && upToDate_)
         {
-          for (auto &data: datas_)
+          std::ofstream tmpFile(Rafale::sessionsDirectory + "/_session_" + id_);
+          if (tmpFile.is_open())
             {
-              if (data.first.size() && data.second.size())
-                tmpFile << Rafale::UriEncode(data.first) << "\n" << Rafale::UriEncode(data.second) << "\n";
+              for (auto &data: datas_)
+                {
+                  if (data.first.size() && data.second.size())
+                    tmpFile << Rafale::UriEncode(data.first) << "\n" << Rafale::UriEncode(data.second) << "\n";
+                }
             }
+          saveUpToDate_ = true;
+          upToDate_ = false;
+          datas_.clear();
         }
-      upToDate_ = false;
-      datas_.clear();
     }
 
     void        Load()
     {
-      std::ifstream tmpFile(Rafale::sessionsDirectory + "/_session_" + id_);
-      if (tmpFile.is_open())
+      if (!upToDate_)
         {
-          while (!tmpFile.eof())
+          std::ifstream tmpFile(Rafale::sessionsDirectory + "/_session_" + id_);
+          if (tmpFile.is_open())
             {
-              std::string   name;
-              getline(tmpFile, name);
-              std::string   value;
-              getline(tmpFile, value);
-              datas_[Rafale::UriDecode(name)] = Rafale::UriDecode(value);
+              while (!tmpFile.eof())
+                {
+                  std::string   name;
+                  getline(tmpFile, name);
+                  std::string   value;
+                  getline(tmpFile, value);
+                  datas_[Rafale::UriDecode(name)] = Rafale::UriDecode(value);
+                }
               std::ofstream tmpFile2(Rafale::sessionsDirectory + "/SAVE");
               tmpFile2 << "PLI";
             }
+          upToDate_ = true;
         }
-      upToDate_ = true;
     }
 
     std::string id_;
