@@ -53,6 +53,15 @@ std::string   Rafale::ToLower(const std::string &value)
   return value;
 }
 
+std::string   Rafale::ToUpper(const std::string &value)
+{
+  for (char c: value)
+    {
+      if (c >= 'a' && c <= 'z')
+        c -= ('a' - 'A');
+    }
+  return value;
+}
 
 // almost all the above code found at http://www.codeguru.com/cpp/cpp/string/conversions/article.php/c12759
 

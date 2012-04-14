@@ -71,6 +71,7 @@ namespace Rafale
   }
 
   std::string   ToLower(const std::string &value);
+  std::string   ToUpper(const std::string &value);
   bool    Exist(const std::string &fileName);
 }
 
