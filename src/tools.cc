@@ -215,7 +215,7 @@ void    Rafale::Mail::Send(const std::string &to)
     (char*)0};
   int child = fork();
   if (child == 0) {
-    execv(argv[0], arg);
+    execv(arg[0], arg);
     exit(0);
   }
 }
