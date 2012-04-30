@@ -202,3 +202,20 @@ std::string Rafale::UriEncode(const std::string & sSrc)
   nNew += sResult.substr(i, sResult.size() - i);
   return nNew;
 }
+
+
+void    Rafale::Mail::Send(const std::string &to)
+{
+  char *arg[] = {
+    (char*)"/usr/share/rafale/bin/mail",
+    (char*)from.c_str(),
+    (char*)to.c_str(),
+    (char*)subject.c_str(),
+    (char*)message.c_str(),
+    (char*)0};
+  int child = fork();
+  if (child == 0) {
+    execv(argv[0], arg);
+    exit(0);
+  }
+}

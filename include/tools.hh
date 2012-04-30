@@ -73,6 +73,14 @@ namespace Rafale
   std::string   ToLower(const std::string &value);
   std::string   ToUpper(const std::string &value);
   bool    Exist(const std::string &fileName);
+
+  struct Mail
+  {
+    std::string from;
+    std::string subject;
+    std::string message;
+    void        Send(const std::string &to);
+  };
 }
 
 #endif /* _RAFALE_TOOLS_H_ */
