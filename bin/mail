@@ -15,7 +15,8 @@ $to_add = $argv[2];
 $subject = $argv[3];
 $message = $argv[4];
 
-$headers = "From: $from_add \r\n";
+$headers = "Content-type: text/html; charset=iso-8859-1\r\n";
+$headers .= "From: $from_add \r\n";
 $headers .= "Reply-To: $from_add \r\n";
 $headers .= "Return-Path: $from_add\r\n";
 $headers .= "X-Mailer: rafale \r\n";
