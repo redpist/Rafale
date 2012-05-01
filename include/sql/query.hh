@@ -214,6 +214,120 @@ namespace Rafale
         }
       return result;
     }
+
+
+    template <class CurrentModel>
+    std::shared_ptr<std::list<CurrentModel>>    Query(const std::map<std::string, Rafale::SQL::Data<Rafale::SQL::Raw> > &where, std::string order)
+    {
+      sql::Driver                         *driver =sql::mysql::get_driver_instance() ;
+      std::unique_ptr<sql::Connection>    connection;
+      std::unique_ptr<sql::Statement>     statement;
+      std::string dataBase;
+      std::string host;
+      std::string user;
+
+
+      // std::ofstream outputFile("/var/log/rafale/query.log"); // LOGS
+
+      host = Rafale::config["db.host"];
+      if (!host.size())
+        {
+          //todo erreur no db.host section in config.cc
+        }
+
+      user = Rafale::config["db.user"];
+      if (!user.size())
+        {
+          //todo erreur no db.user section in config.cc
+        }
+
+      std::string password = Rafale::config["db.password"];
+      if (!password.size())
+        {
+          //todo erreur no db.password section in config.cc
+        }
+
+      connection = std::unique_ptr<sql::Connection>(driver->connect(host, user, password));
+      statement = std::unique_ptr<sql::Statement>(connection->createStatement());
+
+      dataBase = Rafale::config["db.database"];
+      if (!dataBase.size())
+        {
+          //todo erreur no db.database section in config.cc
+        }
+      statement->execute("USE `" + dataBase + "`");
+      std::string       sql;
+      sql = "SELECT ";
+      {
+        int nbCommas = 0;
+        for (auto member : CurrentModel::datas_)
+          {
+            sql += member.first + ", ";
+            ++nbCommas;
+          }
+        if (nbCommas > 0)
+          sql.erase(sql.end() - 2, sql.end()); // clean last comma
+        sql += ' ';
+      }
+      sql += "FROM " + CurrentModel::tableName;
+      if (where.size())
+        {
+          sql += " WHERE ";
+          int i  = 0;
+          for (auto criteria : where)
+            {
+              if (i++)
+                sql += " AND ";
+              sql += '`' + CurrentModel::tableName  + "`.`" + criteria.first + "`="  + criteria.second.Serialize();
+            }
+        }
+      if (order.size())
+        {
+          sql += "ORDER BY `" + order + "`"; // !!!!!! INJECTION HERE !! GO MOVE MY F***ING ASS TO CREATE TRUE QUERIES
+        }
+
+      // if (outputFile.is_open()) // LOGS
+      //   {
+      //     outputFile << "Query: " << sql << std::endl;
+      //   }
+      std::shared_ptr<std::list<CurrentModel>> result(new std::list<CurrentModel>());
+      std::unique_ptr<sql::ResultSet>  res(statement->executeQuery(sql));
+      while (res->next())
+        {
+          CurrentModel model;
+          for (auto member : CurrentModel::datas_)
+          {
+            switch (member.second.Type())
+              {
+              case SQL::integer:
+                member.second.Set(model, res->getInt(member.first));
+                break;
+
+              case SQL::boolean:
+                member.second.Set(model, static_cast<bool>(res->getInt(member.first)));
+                break;
+
+              case SQL::floating:
+                member.second.Set(model, SQL::Tools::GetFloat<decltype(res), decltype(member.first)>(res, member.first));
+                break;
+
+              case SQL::string:
+                member.second.Set(model, res->getString(member.first));
+                break;
+
+              case SQL::dateTime:
+                member.second.Set(model, Rafale::DateTime(res->getString(member.first)));
+                break;
+
+              default:
+                break;
+              }
+          }
+          result->push_back(model);
+        }
+      return result;
+    }
+
   }
 }
 
