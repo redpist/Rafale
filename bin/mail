@@ -24,7 +24,7 @@ $headers .= "X-Mailer: rafale \r\n";
 if(!mail($to_add,$subject,$message,$headers))
   {
     $logFile = fopen('/var/log/rafale/mail.log', 'a');
-    fwrite($logFile, "MAIL FAILED : From <<$from_add>>, To <<$to_add>>, subject <<$subject>>");
+    fwrite($logFile, "MAIL FAILED : From <<$from_add>>, To <<$to_add>>, subject <<$subject>>\n");
     fclose($logFile);
   }
 

@@ -219,3 +219,44 @@ void    Rafale::Mail::Send(const std::string &to)
     exit(0);
   }
 }
+
+static bool Rafale::Mail::IsValid(const std::string &addr) // thx to oreilly =)
+{
+  const char *address = addr.c_str();
+  int        count = 0;
+  const char *c, *domain;
+  static char *rfc822_specials = "()<>@,;:\\\"[]";
+
+  /* first we validate the name portion (name@domain) */
+  for (c = address;  *c;  c++) {
+    if (*c == '\"' && (c == address || *(c - 1) == '.' || *(c - 1) == 
+        '\"')) {
+      while (*++c) {
+        if (*c == '\"') break;
+        if (*c == '\\' && (*++c == ' ')) continue;
+        if (*c <= ' ' || *c >= 127) return false;
+      }
+      if (!*c++) return false;
+      if (*c == '@') break;
+      if (*c != '.') return false;
+      continue;
+    }
+    if (*c == '@') break;
+    if (*c <= ' ' || *c >= 127) return false;
+    if (strchr(rfc822_specials, *c)) return false;
+  }
+  if (c == address || *(c - 1) == '.') return false;
+
+  /* next we validate the domain portion (name@domain) */
+  if (!*(domain = ++c)) return false;
+  do {
+    if (*c == '.') {
+      if (c == domain || *(c - 1) == '.') return false;
+      count++;
+    }
+    if (*c <= ' ' || *c >= 127) return false;
+    if (strchr(rfc822_specials, *c)) return false;
+  } while (*++c);
+
+  return (count >= 1);
+}

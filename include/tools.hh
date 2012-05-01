@@ -80,6 +80,7 @@ namespace Rafale
     std::string subject;
     std::string message;
     void        Send(const std::string &to);
+    static bool IsValid(const std::string &addr);
   };
 }
 
