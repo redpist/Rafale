@@ -90,7 +90,7 @@ namespace Rafale
 
       /* first we validate the name portion (name@domain) */
       for (c = address;  *c;  c++) {
-        if (*c == '\"' && (c == address || *(c - 1) == '.' || *(c - 1) == 
+        if (*c == '\"' && (c == address || *(c - 1) == '.' || *(c - 1) ==
                            '\"')) {
           while (*++c) {
             if (*c == '\"') break;

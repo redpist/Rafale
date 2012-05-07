@@ -46,6 +46,16 @@ namespace Rafale
       return mktime(&tm_) > mktime(&const_cast<Rafale::DateTime&>(oth).tm_);
     }
 
+    bool        operator<=(const Rafale::DateTime &oth)
+    {
+      return mktime(&tm_) <= mktime(&const_cast<Rafale::DateTime&>(oth).tm_);
+    }
+
+    bool        operator>=(const Rafale::DateTime &oth)
+    {
+      return mktime(&tm_) >= mktime(&const_cast<Rafale::DateTime&>(oth).tm_);
+    }
+
     bool        operator==(const Rafale::DateTime &oth)
     {
       return mktime(&tm_) == mktime(&const_cast<Rafale::DateTime&>(oth).tm_);
