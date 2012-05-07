@@ -188,7 +188,7 @@ std::string    SetCookies()
   for (auto cookie: Rafale::cookies)
     {
       if (cookie.second.modified)
-        result += "Set-Cookie: " + Rafale::UriEncode(cookie.first) + '=' + Rafale::UriEncode(cookie.second.Value()) + "; expires=Sun, 17-Jan-2038 19:14:01 GMT; path=/; domain=" + Rafale::serverDatas["SERVER_ADDR"] + "\r\n";
+        result += "Set-Cookie: " + Rafale::UriEncode(cookie.first) + '=' + Rafale::UriEncode(cookie.second.Value()) + "; expires=Sun, 17-Jan-2038 19:14:01 GMT; path=/; domain=" + Rafale::serverDatas["SERVER_NAME"] + "\r\n";
     }
   return result;
 }
