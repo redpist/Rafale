@@ -3,10 +3,10 @@
 #include "controllers/Default.hh"
 
 Rafale::Config Rafale::config = {
-  {"db.database", "name"},
+  {"db.database", "testrafale"},
   {"db.host", "tcp://127.0.0.1:3306"},
-  {"db.user", "user"},
-  {"db.password", "password"}
+  {"db.user", "root"},
+  {"db.password", ""}
 };
 
 int main()
