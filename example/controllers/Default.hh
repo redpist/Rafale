@@ -36,6 +36,11 @@ protected:
 
   int  i_ = 42;
 
+  std::vector<std::string> tab_ = { "zero",
+                                    "one",
+                                    "two",
+                                    "three"};
+
   void    Control()
   {
   }
