@@ -1,0 +1,10 @@
+{
+	"folders":
+	[
+		{
+			"path": "/home/redpist/dev/rafale",
+			"name": "Root",
+			"folder_exclude_patterns": ["build", ".keep"]
+		}
+	]
+}

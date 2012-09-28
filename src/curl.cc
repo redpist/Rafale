@@ -24,33 +24,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_H_
-#define _RAFALE_H_
+#include <rafale/curl.hh>
+#include <iostream>
 
-#include <map>
-#include <string>
-
-namespace Rafale
+namespace Curl
 {
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
+  std::string Session::userAgent_ = "libcurl-agent/1.0";
+
+  std::size_t Session::writeData(void *ptr, size_t size, size_t nmemb, void *res)
+  {
+    size_t realsize = size * nmemb;
+
+    static_cast<std::string*>(res)->append(static_cast<char*>(ptr), realsize);
+    return realsize;
+  }
+
+  Session::Session(const std::string &url,
+                   std::string &res)
+  {
+    auto curl_handle = curl_easy_init();
+    curl_easy_setopt(curl_handle, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYPEER , true);
+    curl_easy_setopt(curl_handle, CURLOPT_SSL_VERIFYHOST , true);
+    curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 1);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, &Session::writeData);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &res);
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, Session::userAgent_.c_str());
+    curl_easy_perform(curl_handle);
+    curl_easy_cleanup(curl_handle);
+  }
+
+
 }
-
-#define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
-
-#include "rafale/model.hh"
-#include "rafale/controller.hh"
-#include "rafale/cookies.hh"
-#include "rafale/tools.hh"
-
-#include "rafale/file.hh"
-#include "rafale/sessions.hh"
-
-#include "rafale/server.hh"
-
-#endif /* _RAFALE_H_ */

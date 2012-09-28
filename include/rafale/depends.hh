@@ -24,33 +24,49 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_H_
-#define _RAFALE_H_
+#ifndef _RAFALE_DEPENDS_H_
+#define _RAFALE_DEPENDS_H_
 
-#include <map>
-#include <string>
+#include <iostream>
+#include <functional>
+
+#include <type_traits>
+#include <typeinfo>
 
 namespace Rafale
 {
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
+  class Controller;
+  class ContainerController;
+
+
+  namespace Controllers
+  {
+    typedef std::function<void (void)> RendererType_;
+
+    template <class DependentController, template <class Controller> class Controller>
+    struct Depends
+    {
+    protected:
+      Controller<DependentController>   container;
+
+      Depends()
+      {
+         if (!container.render_)
+          container.render_ = [this] (void) -> void {
+            // container.Control_();
+            container.Render_();
+          };
+        static_cast<DependentController*>(this)->render_ = [=] (void) -> void
+          {
+            container.dependentRender_ = [this] (void) -> void {
+              static_cast<DependentController*>(this)->Render_();
+            };
+            container.Control_();
+            container.render_();
+          };
+      }
+    };
+  }
 }
 
-#define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
-
-#include "rafale/model.hh"
-#include "rafale/controller.hh"
-#include "rafale/cookies.hh"
-#include "rafale/tools.hh"
-
-#include "rafale/file.hh"
-#include "rafale/sessions.hh"
-
-#include "rafale/server.hh"
-
-#endif /* _RAFALE_H_ */
+#endif /* _RAFALE_DEPENDS_H_ */

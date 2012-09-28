@@ -1,4 +1,0 @@
-<h1>Le Test</h1>
-        <c++>          std::cout << "TEST" << std::endl;
-          std::cout << str << std::endl;
-          std::cout << lulz << std::endl;        </c++>

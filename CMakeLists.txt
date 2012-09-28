@@ -1,21 +1,11 @@
 #set gcc version first
-SET(CMAKE_CXX_COMPILER g++)
-
-## Compiler version check.
-## Calling directly g++-x.y is a bad solution since some distros lack symlinks with version number.
-execute_process(COMMAND         g++ -dumpversion
-                COMMAND         tr -d .
-                OUTPUT_VARIABLE GCC_VERSION
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-IF(${GCC_VERSION} LESS "460")
-        MESSAGE(SEND_ERROR "gcc version must be >= 4.6")
-ENDIF()
+SET(CMAKE_CXX_COMPILER g++-4.7)
 
 PROJECT(rafale)
 
-cmake_minimum_required(VERSION 2.6)
+add_subdirectory(rafale-view)
 
+cmake_minimum_required(VERSION 2.8)
 
 #Libraries Section
 SET(${PROJECT_NAME}_LIB_DIRECTORY lib)
@@ -23,7 +13,6 @@ INCLUDE_DIRECTORIES(
 										)
 
 LINK_DIRECTORIES(/usr/lib/mysql)
-
 
 #Headers
 SET(${PROJECT_NAME}_HEADER_DIRECTORY include/)
@@ -35,19 +24,44 @@ INCLUDE_DIRECTORIES(
 #Sources
 SET(${PROJECT_NAME}_SRC_DIRECTORY src/)
 SET(${PROJECT_NAME}_SRCS
-    ${${PROJECT_NAME}_SRC_DIRECTORY}/main.cc
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/server.cc
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/controller.cc
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/curl.cc
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/tools.cc
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/plugin/paypal.cc
 		)
 
-SET(CMAKE_CXX_FLAGS "-Wextra -Wall -std=c++0x")
-
+SET(CMAKE_CXX_FLAGS "-Wextra -Wall -std=c++11")
 
 #Compilation Section
-add_executable(${PROJECT_NAME}
-							${${PROJECT_NAME}_SRCS}
-							)
+add_library (${PROJECT_NAME}
+							${${PROJECT_NAME}_SRCS})
 
 #link section
 TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-	                    mysqlclient_r
+	                    mysqlclient
                       mysqlcppconn
+                      fcgi
+                      curl
                       )
+
+INSTALL(
+        TARGETS ${PROJECT_NAME} DESTINATION lib
+        )
+
+INSTALL(
+        FILES "misc/FindRafale.cmake" DESTINATION /usr/share/cmake-2.8/Modules/
+        )
+
+INSTALL(
+        FILES "bin/rafale-mail" DESTINATION bin
+        )
+
+
+INSTALL(
+        FILES "${${PROJECT_NAME}_HEADER_DIRECTORY}/rafale.h" DESTINATION include
+        )
+
+INSTALL(
+        DIRECTORY "${${PROJECT_NAME}_HEADER_DIRECTORY}/rafale" DESTINATION include
+        )

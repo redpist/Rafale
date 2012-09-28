@@ -24,33 +24,51 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_H_
-#define _RAFALE_H_
+#ifndef _RAFALE_DISPATCHER_H_
+#define _RAFALE_DISPATCHER_H_
 
-#include <map>
 #include <string>
-
-namespace Rafale
-{
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
-}
-
-#define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
-
-#include "rafale/model.hh"
+#include <iostream>
 #include "rafale/controller.hh"
-#include "rafale/cookies.hh"
-#include "rafale/tools.hh"
+#include <fstream>
 
-#include "rafale/file.hh"
-#include "rafale/sessions.hh"
+class Dispatcher
+{
+public:
+  Dispatcher(std::string url)
+  {
+    std::ofstream outputFile("/var/log/rafale/dispatcher.log"); // LOGS
+    if (outputFile.is_open()) // LOGS
+      {
+        outputFile << "Url: " << url << std::endl;
+      }
 
-#include "rafale/server.hh"
+    // {
+    //   std::size_t offset = url.find("http://");
+    //   if (offset == 0)
+    //     url = url.substr(sizeof("http://") - 1, url.size() - sizeof("http://") + 1);
+    // }
+    std::size_t startController = url.find("/");
+    if (startController == std::string::npos)
+      controller_ = "/";
+    else
+        controller_ = url.substr(startController);
+    if (!controller_.size())
+      controller_ = "/";
+  }
 
-#endif /* _RAFALE_H_ */
+  const std::string &String()
+  {
+    return controller_;
+  }
+
+  ~Dispatcher()
+  {
+  }
+
+
+private:
+  std::string   controller_;
+};
+
+#endif /* _RAFALE_DISPATCHER_H_ */

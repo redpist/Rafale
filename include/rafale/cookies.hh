@@ -24,33 +24,85 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_H_
-#define _RAFALE_H_
+#ifndef _RAFALE_COOKIES_H_
+#define _RAFALE_COOKIES_H_
 
-#include <map>
+#include "rafale.h"
+#include "rafale/tools.hh"
 #include <string>
+#include <map>
+#include <climits>
 
 namespace Rafale
 {
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
+  class Cookie
+  {
+  public:
+    Cookie(const std::string &value = "") : modified(true), value_(value)
+    {
+    }
+
+    Cookie &operator=(const std::string &value)
+    {
+      modified = true;
+      value_ = Rafale::Replace(value, ";", "");
+      value_ = Rafale::Replace(value_, "\r\n", "");
+      return *this;
+    }
+
+    Cookie &operator=(const Cookie &oth)
+    {
+      modified = true;
+      value_ = oth.value_;
+      return *this;
+    }
+
+    int MaxAge(void)
+    {
+      if (isSession_)
+        return INT_MAX;
+      return maxAge_;
+    }
+
+    int MaxAge(int value)
+    {
+      modified = true;
+      isSession_ = false;
+      return maxAge_ = value;
+    }
+
+    std::string Serialize(const std::string &key)
+    {
+      std::string output = "Set-Cookie: " + Rafale::UriEncode(key) + '=' + Rafale::UriEncode(Value());
+      if (!isSession_)
+        output += "; Max-Age=" + Rafale::ToString(MaxAge());
+      output += "; path=/; domain=" + Rafale::serverDatas["SERVER_NAME"] + "\r\n";
+      return output;
+    }
+
+    const std::string &Value()
+    {
+      return value_;
+    }
+
+    void        IsSession()
+    {
+      isSession_ = true;
+    }
+
+
+    ~Cookie() { }
+
+    bool        modified;
+
+  private:
+    bool        isSession_ = false;
+    std::string value_;
+    int         maxAge_ = Rafale::cookiesMaxAge;
+  };
+
+
+  extern std::map<std::string, Rafale::Cookie>       cookies;
 }
 
-#define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
-
-#include "rafale/model.hh"
-#include "rafale/controller.hh"
-#include "rafale/cookies.hh"
-#include "rafale/tools.hh"
-
-#include "rafale/file.hh"
-#include "rafale/sessions.hh"
-
-#include "rafale/server.hh"
-
-#endif /* _RAFALE_H_ */
+#endif /* _RAFALE_COOKIES_H_ */

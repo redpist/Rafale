@@ -1,0 +1,33 @@
+#!/usr/bin/php
+<?php
+
+   /* TEMPORARY MAILER !! REALLY TEMPORARY !! */
+
+   // argv[1] = from
+   // argv[2] = to
+   // argv[3] = subject
+   // argv[4] = message
+   // argv[5] = from_title
+
+$from_add = $argv[1];
+
+$to_add = $argv[2];
+
+$subject = $argv[3];
+$message = $argv[4];
+$from_title = $argv[5];
+
+$headers = "Content-type: text/html; charset=iso-8859-1\r\n";
+$headers .= "From: $from_title <$from_add> \r\n";
+$headers .= "Reply-To: $from_add \r\n";
+$headers .= "Return-Path: $from_add\r\n";
+$headers .= "X-Mailer: rafale \r\n";
+
+if(!mail($to_add,$subject,$message,$headers))
+  {
+    $logFile = fopen('/var/log/rafale/mail.log', 'a');
+    fwrite($logFile, "MAIL FAILED : From <<$from_add>>, To <<$to_add>>, subject <<$subject>>, content <<$message>>\n");
+    fclose($logFile);
+  }
+
+?>

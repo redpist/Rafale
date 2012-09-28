@@ -1,8 +1,10 @@
-#include "tools.hh"
 #include <cstdint>
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <unistd.h>
+#include "rafale/tools.hh"
+
 
 time_t        Rafale::Now()
 {
@@ -207,11 +209,12 @@ std::string Rafale::UriEncode(const std::string & sSrc)
 void    Rafale::Mail::Send(const std::string &to)
 {
   char *arg[] = {
-    (char*)"/usr/share/rafale/bin/mail",
+    (char*)"rafale-mail",
     (char*)from.c_str(),
     (char*)to.c_str(),
     (char*)subject.c_str(),
     (char*)message.c_str(),
+    (char*)fromTitle.c_str(),
     (char*)0};
   int child = fork();
   if (child == 0) {

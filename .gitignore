@@ -19,3 +19,6 @@ a.out
 *.o
 
 example/generated/*
+
+#sublime-workspace file
+rafale.sublime-workspace

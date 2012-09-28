@@ -24,33 +24,28 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_H_
-#define _RAFALE_H_
+#ifndef _RAFALE_CURL_H_
+#define _RAFALE_CURL_H_
 
-#include <map>
 #include <string>
+#include <functional>
 
-namespace Rafale
+#include <curl/curl.h>
+#include <curl/easy.h>
+
+namespace Curl
 {
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
+  class Session
+  {
+  public:
+    Session(const std::string &url,
+            std::string &res);
+  private:
+
+    static std::size_t writeData(void *ptr, size_t size, size_t nmemb, void *res);
+
+    static std::string userAgent_;
+  };
 }
 
-#define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
-
-#include "rafale/model.hh"
-#include "rafale/controller.hh"
-#include "rafale/cookies.hh"
-#include "rafale/tools.hh"
-
-#include "rafale/file.hh"
-#include "rafale/sessions.hh"
-
-#include "rafale/server.hh"
-
-#endif /* _RAFALE_H_ */
+#endif /* _RAFALE_CURL_H_ */

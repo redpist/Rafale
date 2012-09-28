@@ -24,33 +24,52 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_H_
-#define _RAFALE_H_
+#ifndef _RAFALE_PLUGIN_PAYPAL_H_
+#define _RAFALE_PLUGIN_PAYPAL_H_
 
-#include <map>
+#include "rafale/curl.hh"
+
 #include <string>
+#include <map>
 
-namespace Rafale
+class Paypal
 {
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
-}
+  std::string seller_;
+  std::string pwd_;
+  std::string signature_;
+  std::string localecode_;
+  std::string currencycode_;
+public:
+  std::string hdrimg_;
+		Paypal() = delete;
+		Paypal(
+				const std::string &seller,
+				const std::string &pwd,
+				const std::string &signature,
+				const std::string &localecode,
+				const std::string &currencycode,
+				const std::string &hdrimg = "") :
+					seller_(seller),
+					pwd_(pwd),
+					signature_(signature),
+					localecode_(localecode),
+					currencycode_(currencycode),
+					hdrimg_(hdrimg)
+				{}
+void  GetToken(
+                        const float amount,
+                        const std::string &desc,
+                        const std::string &returnUrl,
+                        const std::string &cancelUrl,
+                        const std::string &mail,
+                        const std::string &custom = "");
+  void  GetExpressCheckoutDetails(const std::string &token);
+  void  DoExpressCheckoutPayment(const std::string &token,
+                                 const std::string &payerId,
+                                 const float amount);
+  static std::string version;
+  static std::string url;
+  std::map<std::string, std::string> data;
+};
 
-#define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
-
-#include "rafale/model.hh"
-#include "rafale/controller.hh"
-#include "rafale/cookies.hh"
-#include "rafale/tools.hh"
-
-#include "rafale/file.hh"
-#include "rafale/sessions.hh"
-
-#include "rafale/server.hh"
-
-#endif /* _RAFALE_H_ */
+#endif /* _RAFALE_PLUGIN_PAYPAL_H_ */

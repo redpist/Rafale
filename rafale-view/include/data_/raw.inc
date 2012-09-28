@@ -24,33 +24,42 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_H_
-#define _RAFALE_H_
-
-#include <map>
-#include <string>
-
-namespace Rafale
+class Raw
 {
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
-}
+public:
+  Raw() = delete;
+  Raw(const std::string &str) : str_(str) { }
+  ~Raw() { }
 
-#define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
+  inline std::string EscapeSpecialChar(const std::string& buffer) const
+  {
+    std::string result;
+    for (auto it = begin(buffer); it != end(buffer); ++it)
+      {
+        switch (*it)
+          {
+          case '\\':
+            result += "\\\\";
+            break;
+          case '"':
+            result += "\\\"";
+            break;
+          case '\n':
+            result += "\\n";
+            break;
+          default:
+            result += *it;
+            break;
+          }
+      }
+    return result;
+  }
 
-#include "rafale/model.hh"
-#include "rafale/controller.hh"
-#include "rafale/cookies.hh"
-#include "rafale/tools.hh"
 
-#include "rafale/file.hh"
-#include "rafale/sessions.hh"
-
-#include "rafale/server.hh"
-
-#endif /* _RAFALE_H_ */
+  std::string Serialize() const
+  {
+    return "std::cout << \"" + EscapeSpecialChar(str_) + "\";\n";
+  }
+private:
+  std::string str_;
+};
