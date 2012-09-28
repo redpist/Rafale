@@ -27,7 +27,7 @@
 #ifndef _RAFALE_CONFIG_H_
 #define _RAFALE_CONFIG_H_
 
-#include "rafale/abstract.h"
+#include "rafale/abstract.hh"
 
 namespace Rafale
 {

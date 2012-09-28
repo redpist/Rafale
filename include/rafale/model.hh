@@ -27,7 +27,7 @@
 #ifndef _RAFALE_MODEL_H_
 #define _RAFALE_MODEL_H_
 
-#include "rafale/abstract.h"
+#include "rafale/abstract.hh"
 #include "rafale/config.hh"
 #include <string>
 #include <algorithm>

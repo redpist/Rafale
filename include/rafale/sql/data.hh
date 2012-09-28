@@ -28,7 +28,7 @@
 #define _RAFALE_SQL_DATA_H_
 
 #include <sstream>
-#include <rafale/abstract.h>
+#include "rafale/abstract.hh"
 
 namespace Rafale
 {
