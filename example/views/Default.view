@@ -1,20 +1,12 @@
-<html>
-  <head>
-    <title>Test</title>
-  </head>
-  <body>
-    <h1>Test</h1>
-    <p>i_ = <c++(i_)/></p>
-    <c++>
-       int i = 0;
-       for (auto &str: tab_)
-       {
-    </c++>
-       <p>tab[<c++(i)/>] = "<c++(str)/>"</p>
-    <c++>
-      ++i;
-      }
-    </c++>
-  </body>
-</html>
-
+<h1>Test</h1>
+<p>i_ = <c++(i_)/></p>
+<c++>
+   int i = 0;
+   for (auto &str: tab_)
+   {
+</c++>
+   <p>tab[<c++(i)/>] = "<c++(str)/>"</p>
+<c++>
+  ++i;
+  }
+</c++>

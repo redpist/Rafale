@@ -24,28 +24,21 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_EXAMPLE_CONTROLLER_DEFAULT_H_
-#define _RAFALE_EXAMPLE_CONTROLLER_DEFAULT_H_
+#ifndef _RAFALE_EXAMPLE_CONTROLLER_LAYOUT_H_
+#define _RAFALE_EXAMPLE_CONTROLLER_LAYOUT_H_
 
 #include <rafale.h>
-#include "controllers/Layout.hh"
 
-class Default : public Rafale::Controller,
-                public Rafale::Controllers::Depends<Default, Layout>
+template <typename DependentController>
+class Layout : public Rafale::ContainerController
 {
 protected:
-  #include "views/Default.inc"
-
-  int  i_ = 42;
-
-  std::vector<std::string> tab_ = { "zero",
-                                    "one",
-                                    "two",
-                                    "three"};
+  #include "views/Layout.inc"
 
   void    Control()
   {
+
   }
 };
 
-#endif /* _RAFALE_EXAMPLE_CONTROLLER_DEFAULT_H_ */
+#endif /* _RAFALE_EXAMPLE_CONTROLLER_LAYOUT_H_ */
