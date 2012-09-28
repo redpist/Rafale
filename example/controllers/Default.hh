@@ -46,5 +46,4 @@ protected:
   }
 };
 
-
 #endif /* _RAFALE_EXAMPLE_CONTROLLER_DEFAULT_H_ */
