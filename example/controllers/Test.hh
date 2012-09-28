@@ -103,21 +103,9 @@ class Test : public Rafale::Controller
       }
     std::cout << "</tbody></table>" << std::endl;
 
-    std::cout << "<br />\nCOOKIES 2 ::<br />" << std::endl;
-    std::cout << "<table border=\"1\">\n"
-      "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
-      "<tbody>";
-    for (auto var: Rafale::cookies)
-      {
-        std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Value() << "</td></tr>" << std::endl;
-      }
-    std::cout << "</tbody></table>" << std::endl;
-
-
     session["TEST"] = "Hey Ho ! Timestamp=" + Rafale::ToString(time(0));
-
-
   }
+
 };
 
 #endif /* _RAFALE_EXAMPLE_CONTROLLER_TEST_H_ */
