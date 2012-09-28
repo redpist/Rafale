@@ -209,7 +209,7 @@ std::string Rafale::UriEncode(const std::string & sSrc)
 void    Rafale::Mail::Send(const std::string &to)
 {
   char *arg[] = {
-    (char*)"rafale-mail",
+    (char*)"/usr/local/bin/rafale-mail",
     (char*)from.c_str(),
     (char*)to.c_str(),
     (char*)subject.c_str(),
@@ -218,7 +218,7 @@ void    Rafale::Mail::Send(const std::string &to)
     (char*)0};
   int child = fork();
   if (child == 0) {
-    execv(arg[0], arg);
-    exit(0);
+    execvp(arg[0], arg);
+   exit(0);
   }
 }

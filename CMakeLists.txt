@@ -54,7 +54,9 @@ INSTALL(
         )
 
 INSTALL(
-        FILES "bin/rafale-mail" DESTINATION bin
+        FILES "bin/rafale-mail" DESTINATION bin PERMISSIONS  OWNER_WRITE OWNER_READ OWNER_EXECUTE
+     GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE
         )
 
 
