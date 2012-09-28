@@ -43,7 +43,7 @@ namespace Rafale
   {
     typedef std::function<void (void)> RendererType_;
 
-    template <class DependentController, template <class Controller> class Controller>
+    template <class DependentController, template <class DependentController> class Controller>
     struct Depends
     {
     protected:
