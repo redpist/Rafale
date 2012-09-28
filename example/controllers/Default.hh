@@ -34,6 +34,8 @@ class Default : public Rafale::Controller
 protected:
   #include "views/Default.inc"
 
+  int  i_ = 42;
+
   void    Control()
   {
   }
