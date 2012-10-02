@@ -2,7 +2,7 @@
 	"folders":
 	[
 		{
-			"path": "/home/redpist/dev/rafale",
+			"path": ".",
 			"name": "Root",
 			"folder_exclude_patterns": ["build", ".keep"]
 		}
