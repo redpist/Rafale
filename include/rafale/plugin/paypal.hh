@@ -41,28 +41,28 @@ class Paypal
   std::string currencycode_;
 public:
   std::string hdrimg_;
-		Paypal() = delete;
-		Paypal(
-				const std::string &seller,
-				const std::string &pwd,
-				const std::string &signature,
-				const std::string &localecode,
-				const std::string &currencycode,
-				const std::string &hdrimg = "") :
-					seller_(seller),
-					pwd_(pwd),
-					signature_(signature),
-					localecode_(localecode),
-					currencycode_(currencycode),
-					hdrimg_(hdrimg)
-				{}
-void  GetToken(
-                        const float amount,
-                        const std::string &desc,
-                        const std::string &returnUrl,
-                        const std::string &cancelUrl,
-                        const std::string &mail,
-                        const std::string &custom = "");
+	Paypal() = delete;
+	Paypal(
+        const std::string &seller,
+        const std::string &pwd,
+        const std::string &signature,
+        const std::string &localecode,
+        const std::string &currencycode,
+        const std::string &hdrimg = "") :
+          seller_(seller),
+          pwd_(pwd),
+          signature_(signature),
+          localecode_(localecode),
+          currencycode_(currencycode),
+          hdrimg_(hdrimg)
+          {}
+  void  GetToken(
+                 const float amount,
+                 const std::string &desc,
+                 const std::string &returnUrl,
+                 const std::string &cancelUrl,
+                 const std::string &mail,
+                 const std::string &custom = "");
   void  GetExpressCheckoutDetails(const std::string &token);
   void  DoExpressCheckoutPayment(const std::string &token,
                                  const std::string &payerId,
