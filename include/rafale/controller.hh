@@ -78,12 +78,17 @@ namespace Rafale
   {
   public:
     virtual ~Controller() { };
+
+    static const std::string &ContentType()
+    {
+      return contentType;
+    }
+
   protected:
     Controller()
     {
       render_ = [this] (void) -> void { this->Render_(); };
     }
-
 
     template <class DependentController, template <class Controller> class Controller>
     friend struct Controllers::Depends;
@@ -93,6 +98,8 @@ namespace Rafale
     {
       return new ChildController();
     }
+
+    static std::string contentType;
 
   public:
     template    <typename ChildController>

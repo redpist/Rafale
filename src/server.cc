@@ -361,6 +361,11 @@ Rafale::Server::Server()
 }
 
 
+std::string Rafale::Server::ContentType(Rafale::Controller *controller)
+{
+  return "Content-type: " + controller->ContentType() + "\r\n"; 
+}
+
 void    Rafale::Server::Run()
 {
   while(FCGI_Accept() >= 0)
@@ -387,7 +392,8 @@ void    Rafale::Server::Run()
 
         FCGI_printf("%s", SetHeaders().c_str());
         FCGI_printf("%s", SetCookies().c_str());
-        FCGI_printf("Content-type: text/html\r\n\r\n");
+        FCGI_printf(ContentType(p).c_str());
+        FCGI_printf("\r\n");
         FCGI_printf("%s", data.c_str());
         delete p;
       }
