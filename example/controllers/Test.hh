@@ -70,10 +70,10 @@ class Test : public Rafale::Controller
     std::cout << "<table border=\"1\">\n"
       "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
       "<tbody>";
-    for (auto var: Rafale::Env().files)
+    for (auto &var: Rafale::Env().files)
       {
         std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Name() << "</td></tr>" << std::endl;
-        var.second.Copy("/var/www/leeaarn/static/test/" + var.second.Name());
+        var.second.Copy("/tmp/" + var.second.Name());
       }
     std::cout << "</tbody></table>" << std::endl;
 

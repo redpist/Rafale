@@ -46,7 +46,7 @@ namespace Rafale
     void    GetGetDatas_();
     void    GetCookies_();
     void    GetContent_();
-    std::string     &&ParseValue(const std::string &name,
+    std::string     ParseValue(const std::string &name,
                                  const std::string &str,
                                  std::size_t offset = 0,
                                  char assign = '=',

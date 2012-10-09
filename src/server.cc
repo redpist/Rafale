@@ -89,11 +89,11 @@ Rafale::Server::Server()
   Rafale::sessionsDirectory = Rafale::tmpDirectory + "/sessions";
 
   mkdir(Rafale::tmpDirectory.c_str(), 0770);
-  (void)chown(Rafale::tmpDirectory.c_str(), 1000, 33);
+  (void)chown(Rafale::tmpDirectory.c_str(), -1, 33);
   mkdir(Rafale::sessionsDirectory.c_str(), 0770);
-  (void)chown(Rafale::sessionsDirectory.c_str(), 1000, 33);
+  (void)chown(Rafale::sessionsDirectory.c_str(), -1, 33);
   mkdir(Rafale::filesDirectory.c_str(), 0770);
-  (void)chown(Rafale::filesDirectory.c_str(), 1000, 33);
+  (void)chown(Rafale::filesDirectory.c_str(), -1, 33);
 }
 
 

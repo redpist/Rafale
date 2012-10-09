@@ -87,7 +87,7 @@ emptyContent:
 }
 
 
-std::string     &&Rafale::Client::ParseValue(const std::string &name,
+std::string     Rafale::Client::ParseValue(const std::string &name,
                                              const std::string &str,
                                              std::size_t offset,
                                              char assign,
@@ -96,15 +96,15 @@ std::string     &&Rafale::Client::ParseValue(const std::string &name,
 {
   std::size_t startValueOffset = str.find(name + assign + startDelim, offset) + name.size() + sizeof(assign) + sizeof(startDelim);
   std::size_t endValueOffset = str.find(endDelim, startValueOffset); // TO DO : fix \delim
-  return std::move(str.substr(startValueOffset, endValueOffset - startValueOffset));
+  return str.substr(startValueOffset, endValueOffset - startValueOffset);
 }
 
 
 void                   Rafale::Client::FileUpload_(std::string &name, const std::string &content)
 {
-  Rafale::Env().files[name] = Rafale::File(ParseValue("filename", content),
+  Rafale::Env().files[name] = std::move(Rafale::File(ParseValue("filename", content),
                              ParseValue("Content-Type", content, 0, ':', ' ', '\r'),
-                             GetContent(content));
+                             GetContent(content)));
 }
 
 size_t    Rafale::Client::ParseOnepart(std::size_t offset, std::size_t nextOffset)

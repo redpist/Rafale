@@ -38,18 +38,46 @@ namespace Rafale
   class File
   {
   public:
-    File() : empty_(true)
+    File() : empty_(true), removeIt_(false)
     {
     }
 
-    File(const std::string &name, const std::string &contentType, const std::string &content) : contentType_(contentType), empty_(false)
+
+    File(File &&oth) :  tmpName_(oth.tmpName_),
+                        name_(oth.name_),
+                        contentType_(oth.contentType_),
+                        empty_(oth.empty_), removeIt_(oth.removeIt_)
     {
+      oth.removeIt_ = false;
+    }
+
+    File& operator=(File &&oth)
+    {
+      if (this != &oth)
+      {
+        tmpName_ = oth.tmpName_;
+        name_ = oth.name_;
+        contentType_  = oth.contentType_;
+        empty_  = oth.empty_;
+        removeIt_ = oth.removeIt_;
+        oth.removeIt_ = false;
+      }
+      return *this;
+    }
+
+    File(const std::string &name, const std::string &contentType, const std::string &content) : contentType_(contentType), empty_(false), removeIt_(true)
+    {
+      Debug::Log("upload name {" + name + "}", "upload");
+      Debug::Log("upload content {" + content + "}", "upload");
       name_ = Rafale::Replace(name, "\\", "");
       name_ = Rafale::Replace(name_, "/", "_"); // MAGIC PATCHs , GO CLEAN
       tmpName_ = "_file_" + Rafale::ToString(rand());
+      Debug::Log("tmpName_ : " + Rafale::filesDirectory + "/" + tmpName_, "upload");
       std::ofstream tmpFile(Rafale::filesDirectory + "/" + tmpName_);
       if (tmpFile.is_open())
-        tmpFile.write(content.c_str(), content.size()); // TO DO : VERIF
+      {
+        tmpFile.write(content.data(), content.size()); // TO DO : VERIF
+      }
       else
         {
           name_ = "";
@@ -61,16 +89,9 @@ namespace Rafale
     {
       if (!empty_)
         {
-          std::ifstream tmpFile(Rafale::filesDirectory + "/" + tmpName_);
-          std::ofstream destinationFile(destination);
-
-          char      buff[4096];
-          while (!tmpFile.eof())
-            {
-              tmpFile.read(buff, sizeof(buff));
-              std::size_t readed = tmpFile.gcount();
-              destinationFile.write(buff, readed);
-            }
+          std::ifstream tmpFile(Rafale::filesDirectory + "/" + tmpName_); // go check
+          std::ofstream destinationFile(destination); // go check
+          destinationFile << tmpFile.rdbuf();
         }
     }
 
@@ -96,7 +117,7 @@ namespace Rafale
 
     ~File()
     {
-      if (!empty_)
+      if (!empty_ && removeIt_)
         remove(std::string(Rafale::filesDirectory + "/" + tmpName_).c_str());
     }
   private:
@@ -104,6 +125,8 @@ namespace Rafale
     std::string         name_;
     std::string         contentType_;
     bool                empty_;
+    bool                removeIt_;
+    size_t              refCounter_;
   };
 
 }
