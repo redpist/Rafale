@@ -1,0 +1,15 @@
+<html>
+<head>
+  <title>Test</title>
+</head>
+<body>
+  <form action="/test" enctype="multipart/form-data" method="post">
+    <p>
+      Please specify a file, or a set of files:<br>
+      <input type="file" name="datafile" />
+    </p>
+    <input type="submit" value="Send">
+  </form>
+  <c++>Testing();</c++>
+</body>
+</html>

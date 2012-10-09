@@ -33,14 +33,32 @@
 #include <assert.h>
 #include <ctime>
 
+#include <fstream>
 #include <string>
+#include <map>
 #include <functional>
 
 #include <curl/curl.h>
 #include <curl/easy.h>
 
+namespace Debug
+{
+  inline void Log(const std::string &str, const std::string &fileName = "error")
+  {
+    std::fstream  logFile;
+    logFile.open("/var/log/rafale/" + fileName + ".log", std::fstream::out | std::fstream::app);
+    if (logFile.is_open())
+    {
+      logFile << str << std::endl;
+    }
+  }
+}
+
 namespace Rafale
 {
+  void     ExplodeVariables(const std::string &rawData,
+                            std::map<std::string, std::string> &container);
+
   time_t        Now();
 
   std::string UriDecode(const std::string & sSrc);

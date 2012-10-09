@@ -24,6 +24,9 @@ INCLUDE_DIRECTORIES(
 #Sources
 SET(${PROJECT_NAME}_SRC_DIRECTORY src/)
 SET(${PROJECT_NAME}_SRCS
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/client.cc
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/sessions.cc
+    ${${PROJECT_NAME}_SRC_DIRECTORY}/environment.cc
     ${${PROJECT_NAME}_SRC_DIRECTORY}/server.cc
     ${${PROJECT_NAME}_SRC_DIRECTORY}/controller.cc
     ${${PROJECT_NAME}_SRC_DIRECTORY}/curl.cc
@@ -31,7 +34,7 @@ SET(${PROJECT_NAME}_SRCS
     ${${PROJECT_NAME}_SRC_DIRECTORY}/plugin/paypal.cc
 		)
 
-SET(CMAKE_CXX_FLAGS "-Wextra -Wall -std=c++11")
+SET(CMAKE_CXX_FLAGS "-Wextra -Wall -std=c++11 -pthread")
 
 #Compilation Section
 add_library (${PROJECT_NAME}
@@ -42,6 +45,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
 	                    mysqlclient
                       mysqlcppconn
                       fcgi
+                      fcgi++
                       curl
                       )
 

@@ -27,15 +27,19 @@
 #ifndef _RAFALE_SESSIONS_H_
 #define _RAFALE_SESSIONS_H_
 
-#include <rafale/cookies.hh>
 #include <ctime>
 #include <map>
 #include <string>
+#include <mutex>
+#include "rafale/cookies.hh"
+#include "rafale/environment.hh"
 
 namespace Rafale
 {
   class Session
   {
+    static std::mutex mutex_;
+
     Session(const std::string &id, time_t expire) : id_(id), expire_(expire), exist_(false), upToDate_(true), destroyIt_(true), dead_(false)
     {
     }
@@ -75,8 +79,10 @@ namespace Rafale
 
     void        Destroy()
     {
-      Rafale::cookies["sessionid"].MaxAge(0);
+      Rafale::Env().cookies["sessionid"].MaxAge(0);
+      mutex_.lock();
       Session::sessionMap_.erase(id_);
+      mutex_.unlock();
       destroyIt_ = false;
       dead_ = true;
       expire_ = 0;
@@ -96,25 +102,27 @@ namespace Rafale
 
     static Session &Get()
     {
-      if (Rafale::cookies["sessionid"].Value().size()
-          && (Session::sessionMap_.find(Rafale::cookies["sessionid"].Value()) != end(Session::sessionMap_)) && !Session::sessionMap_[Rafale::cookies["sessionid"].Value()]->dead_)
+      std::lock_guard<std::mutex> lockGuard(mutex_);
+
+      if (Rafale::Env().cookies["sessionid"].Value().size()
+          && (Session::sessionMap_.find(Rafale::Env().cookies["sessionid"].Value()) != end(Session::sessionMap_)) && !Session::sessionMap_[Rafale::Env().cookies["sessionid"].Value()]->dead_)
         {
-          if (Session::sessionMap_[Rafale::cookies["sessionid"].Value()]->upToDate_)
+          if (Session::sessionMap_[Rafale::Env().cookies["sessionid"].Value()]->upToDate_)
             {
-              auto it = Session::sessionMap_.find(Rafale::cookies["sessionid"].Value());
+              auto it = Session::sessionMap_.find(Rafale::Env().cookies["sessionid"].Value());
               return *(it->second);
             }
           else
             {
-              auto it = Session::sessionMap_.find(Rafale::cookies["sessionid"].Value());
+              auto it = Session::sessionMap_.find(Rafale::Env().cookies["sessionid"].Value());
               it->second->Load();
               return *(it->second);
             }
           // Rafale::serverDatas["SESSION_EXPIRE"] = "true";
         }
       std::string id = Rafale::ToString(rand()) + Rafale::ToString(rand()) + Rafale::ToString(rand());
-      Rafale::cookies["sessionid"] = id;
-      Rafale::cookies["sessionid"].IsSession();
+      Rafale::Env().cookies["sessionid"] = id;
+      Rafale::Env().cookies["sessionid"].IsSession();
       time_t expire = time(0) + 36000;
       auto session = sessions_.insert(std::pair<time_t, Session>(expire, Session(id, expire)));
       sessionMap_.insert(std::pair<std::string, Session*>(id, &(session.first->second)));
@@ -123,6 +131,7 @@ namespace Rafale
 
     static void Clean()
     {
+      std::lock_guard<std::mutex> lockGuard(mutex_);
       auto it = begin(sessions_);
       for (; (it != end(sessions_)) && (it->first > time(0)); ++it)
         {
@@ -178,7 +187,7 @@ namespace Rafale
               tmpFile2 << "PLI";
             }
           upToDate_ = true;
-          Rafale::cookies["sessionid"].IsSession();
+          Rafale::Env().cookies["sessionid"].IsSession();
         }
     }
 

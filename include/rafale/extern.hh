@@ -24,13 +24,15 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_FCGI_H_
-#define _RAFALE_FCGI_H_
+#ifndef _RAFALE_EXTERN_HH_
+# define _RAFALE_EXTERN_HH_
 
-#define NO_FCGI_DEFINES
+namespace Rafale
+{
+  extern std::string                              tmpDirectory;
+  extern std::string                              filesDirectory;
+  extern std::string                              sessionsDirectory;
+  extern int                                      cookiesMaxAge;
+}
 
-#define  HAVE_IOSTREAM_WITHASSIGN_STREAMBUF
-#include "fcgio.h"
-#include "fcgi_config.h" 
-
-#endif /* _RAFALE_FCGI_H_ */
+#endif /* _RAFALE_EXTERN_HH_ */

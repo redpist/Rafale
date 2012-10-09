@@ -24,13 +24,41 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_FCGI_H_
-#define _RAFALE_FCGI_H_
+#ifndef _RAFALE_ENVIRONMENT_HH_
+# define _RAFALE_ENVIRONMENT_HH_
 
-#define NO_FCGI_DEFINES
+#include "rafale/file.hh"
+#include "rafale/cookies.hh"
 
-#define  HAVE_IOSTREAM_WITHASSIGN_STREAMBUF
-#include "fcgio.h"
-#include "fcgi_config.h" 
+namespace Rafale
+{
 
-#endif /* _RAFALE_FCGI_H_ */
+  class Client;
+
+  struct Environment
+  {
+    std::map<std::string, Rafale::File>      files;
+    std::map<std::string, std::string>       headers;
+    std::map<std::string, Rafale::Cookie>    cookies;
+    std::map<std::string, std::string>       requestDatas;
+    std::map<std::string, std::string>       getDatas;
+    std::map<std::string, std::string>       postDatas;
+  private:
+    static __thread Environment *env_;
+    friend Environment &Env();
+    friend class Rafale::Client;
+  };
+
+
+  inline Environment &Env()
+  {
+    return *Environment::env_;
+  }
+
+  inline const std::string &ServerName()
+  {
+    return Env().requestDatas["SERVER_NAME"];
+  }
+}
+
+#endif /* _RAFALE_ENVIRONMENT_HH_ */

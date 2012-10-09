@@ -24,21 +24,23 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_COOKIES_H_
-#define _RAFALE_COOKIES_H_
+#ifndef _RAFALE_COOKIES_HH_
+#define _RAFALE_COOKIES_HH_
 
-#include "rafale.h"
 #include "rafale/tools.hh"
+#include "rafale/extern.hh"
 #include <string>
 #include <map>
 #include <climits>
 
 namespace Rafale
 {
+  const std::string &ServerName();
+
   class Cookie
   {
   public:
-    Cookie(const std::string &value = "") : modified(true), value_(value)
+    Cookie() : modified(false)
     {
     }
 
@@ -76,7 +78,7 @@ namespace Rafale
       std::string output = "Set-Cookie: " + Rafale::UriEncode(key) + '=' + Rafale::UriEncode(Value());
       if (!isSession_)
         output += "; Max-Age=" + Rafale::ToString(MaxAge());
-      output += "; path=/; domain=" + Rafale::serverDatas["SERVER_NAME"] + "\r\n";
+      output += "; path=/; domain=" + Rafale::ServerName() + "\r\n";
       return output;
     }
 
@@ -93,16 +95,14 @@ namespace Rafale
 
     ~Cookie() { }
 
+  public:
     bool        modified;
-
   private:
     bool        isSession_ = false;
     std::string value_;
     int         maxAge_ = Rafale::cookiesMaxAge;
   };
 
-
-  extern std::map<std::string, Rafale::Cookie>       cookies;
 }
 
-#endif /* _RAFALE_COOKIES_H_ */
+#endif /* _RAFALE_COOKIES_HH_ */

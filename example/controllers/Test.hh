@@ -33,13 +33,14 @@ class Test : public Rafale::Controller
 {
   #include "views/Test.inc"
 
-  void Control()
+  void Testing()
   {
+
     std::cout << "SERVER ::<br />" << std::endl;
     std::cout << "<table border=\"1\">\n"
       "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
       "<tbody>";
-    for (auto var: Rafale::serverDatas)
+     for (auto var: Rafale::Env().requestDatas)
       {
         if (var.first != "CONTENT")
           std::cout << "<tr><td>" << var.first << "</td><td>" << var.second << "</td></tr>" << std::endl;
@@ -50,7 +51,7 @@ class Test : public Rafale::Controller
     std::cout << "<table border=\"1\">\n"
       "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
       "<tbody>";
-    for (auto var: Rafale::getDatas)
+    for (auto var: Rafale::Env().getDatas)
       {
         std::cout << "<tr><td>" << var.first << "</td><td>" << var.second << "</td></tr>" << std::endl;
       }
@@ -60,7 +61,7 @@ class Test : public Rafale::Controller
     std::cout << "<table border=\"1\">\n"
       "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
       "<tbody>";
-    for (auto var: Rafale::postDatas)
+    for (auto var: Rafale::Env().postDatas)
       {
         std::cout << "<tr><td>" << var.first << "</td><td>" << var.second << "</td></tr>" << std::endl;
       }
@@ -69,27 +70,27 @@ class Test : public Rafale::Controller
     std::cout << "<table border=\"1\">\n"
       "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
       "<tbody>";
-    for (auto var: Rafale::files)
+    for (auto var: Rafale::Env().files)
       {
         std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Name() << "</td></tr>" << std::endl;
         var.second.Copy("/var/www/leeaarn/static/test/" + var.second.Name());
       }
     std::cout << "</tbody></table>" << std::endl;
 
+
     std::cout << "<br />\nCOOKIES ::<br />" << std::endl;
     std::cout << "<table border=\"1\">\n"
       "<thead><tr><td>VAR</td><td>VALUE</td></tr></thead>\n"
       "<tbody>";
-    for (auto var: Rafale::cookies)
+    for (auto var: Rafale::Env().cookies)
       {
         std::cout << "<tr><td>" << var.first << "</td><td>" << var.second.Value() << "</td></tr>" << std::endl;
       }
     std::cout << "</tbody></table>" << std::endl;
 
-
-    Rafale::cookies["PetitCookieDeTest0"] = "l'ancien contenu du PetitCookieDeTest1 est {" +
-      Rafale::cookies["PetitCookieDeTest1"].Value() + "}";
-    Rafale::cookies["PetitCookieDeTest1"] = "le timestamp actuel est " + Rafale::ToString(time(0));
+    Rafale::Env().cookies["PetitCookieDeTest0"] = "l'ancien contenu du PetitCookieDeTest1 est {" +
+      Rafale::Env().cookies["PetitCookieDeTest1"].Value() + "}";
+    Rafale::Env().cookies["PetitCookieDeTest1"] = "le timestamp actuel est " + Rafale::ToString(time(0));
 
     Rafale::Session &session = Rafale::Session::Get();
 
@@ -104,6 +105,10 @@ class Test : public Rafale::Controller
     std::cout << "</tbody></table>" << std::endl;
 
     session["TEST"] = "Hey Ho ! Timestamp=" + Rafale::ToString(time(0));
+  }
+
+  void Control()
+  {
   }
 
 };

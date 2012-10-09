@@ -135,9 +135,10 @@ FUNCTION(RAFALE_PROJECT project_name)
 
   TARGET_LINK_LIBRARIES(${RAFALE_SERVICE_NAME}
                         rafale
-  		                          mysqlclient
+  		                  mysqlclient
                         mysqlcppconn
                         fcgi
+                        fcgi++
                         curl
                         )
 ENDFUNCTION(RAFALE_PROJECT)

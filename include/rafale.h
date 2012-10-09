@@ -30,27 +30,15 @@
 #include <map>
 #include <string>
 
-namespace Rafale
-{
-  extern std::map<std::string, std::string>       serverDatas;
-  extern std::map<std::string, std::string>       getDatas;
-  extern std::map<std::string, std::string>       postDatas;
-  extern std::string                              tmpDirectory;
-  extern std::string                              filesDirectory;
-  extern std::string                              sessionsDirectory;
-  extern int                                      cookiesMaxAge;
-}
-
 #define DEFAULT_COOKIES_MAX_AGE 3600 // 1 hour
 
+#include "rafale/extern.hh"
 #include "rafale/model.hh"
 #include "rafale/controller.hh"
-#include "rafale/cookies.hh"
 #include "rafale/tools.hh"
-
-#include "rafale/file.hh"
+#include "rafale/client.hh"
 #include "rafale/sessions.hh"
-
+#include "rafale/cookies.hh"
 #include "rafale/server.hh"
 
 #endif /* _RAFALE_H_ */

@@ -24,10 +24,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_FILE_H_
-#define _RAFALE_FILE_H_
+#ifndef _RAFALE_FILE_HH_
+#define _RAFALE_FILE_HH_
 
-#include "rafale.h"
+#include "rafale/tools.hh"
+#include "rafale/extern.hh"
 #include <cstdlib>
 #include <fstream>
 #include <string>
@@ -105,7 +106,6 @@ namespace Rafale
     bool                empty_;
   };
 
-  extern std::map<std::string, Rafale::File>      files;
 }
 
-#endif /* _RAFALE_FILE_H_ */
+#endif /* _RAFALE_FILE_HH_ */

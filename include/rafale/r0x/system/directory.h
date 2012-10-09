@@ -31,20 +31,22 @@
 #include <dirent.h>
 #include <string>
 
-#include "system/file.h"
+#include "rafale/r0x/system/file.h"
 
 namespace R0x
 {
   namespace System
   {
+
     template <typename StringType>
     class BasicDirectory
     {
     public:
-      BasicDirectory(const StringType &path)
+      BasicDirectory() = delete;
+      BasicDirectory(const StringType &path) : path_(path)
       {
-        if (!(directory_ = opendir(path.c_str())))
-          throw "error while opening directory : " + path;
+        if (!(directory_ = opendir(path_.c_str())))
+          throw std::runtime_error("error while opening directory : " + path_);
       }
 
       // BasicDirectory(const BasicFile<StringType> &path) : path_(path)
@@ -54,10 +56,18 @@ namespace R0x
 
       ~BasicDirectory()
       {
-        closedir(directory_);
+        if (directory_)
+          closedir(directory_);
       }
 
       typedef std::vector<BasicFile<StringType>> FileArray;
+
+      void Close()
+      {
+        if (directory_)
+          closedir(directory_);
+        directory_ = 0;
+      }
 
       const  FileArray &List()
       {
@@ -69,13 +79,58 @@ namespace R0x
         return files_;
       }
 
+      int Remove()
+      {
+        Close();
+        return rmdir(path_.c_str());
+      }
+
+      int RecursiveRemove()
+      {
+        int r = RemoveSubDirectories();
+        if (!r)
+        {
+          r = Remove();
+        }
+        return r;
+      }
+
+      int RemoveSubDirectories()
+      {
+        int     r = 0;
+        struct  dirent *p;
+        while (!r && (p = readdir(directory_)))
+        {
+          int     r2 = -1;
+          if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, ".."))
+            continue;
+          struct stat statbuf;
+          std::string fileName;
+          fileName = path_ + "/";
+          fileName += p->d_name;
+          if (!stat(fileName.c_str(), &statbuf))
+          {
+            if (S_ISDIR(statbuf.st_mode))
+            {
+              BasicDirectory<StringType> childDirectory(fileName);
+              r2 = childDirectory.Remove();
+            }
+            else
+              r2 = unlink(fileName.c_str());
+          }
+          r = r2;
+        }
+        return r;
+      }
+
     private:
-      BasicDirectory();
+      StringType        path_;
       DIR               *directory_;
       FileArray         files_;
     };
 
     typedef BasicDirectory<std::string>      Directory;
+
   }
 }
 

@@ -5,6 +5,19 @@
 #include <unistd.h>
 #include "rafale/tools.hh"
 
+void     Rafale::ExplodeVariables(const std::string &rawData,
+                                  std::map<std::string, std::string> &container)
+{
+  std::string   queryString = rawData;
+  while (queryString.find("&") != std::string::npos)
+    {
+      container[queryString.substr(0, queryString.find("="))] = Rafale::UriDecode(queryString.substr(queryString.find("=") + 1, queryString.find("&") - queryString.find("=") - 1));
+      queryString = queryString.substr(queryString.find("&") + 1, queryString.size() - queryString.find("&") - 1);
+    }
+  if (queryString.size()) {
+    container[queryString.substr(0, queryString.find("="))] = Rafale::UriDecode(queryString.substr(queryString.find("=") + 1, queryString.size()));
+  }
+}
 
 time_t        Rafale::Now()
 {

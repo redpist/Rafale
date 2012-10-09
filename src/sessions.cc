@@ -24,13 +24,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_FCGI_H_
-#define _RAFALE_FCGI_H_
+#include "rafale/sessions.hh"
 
-#define NO_FCGI_DEFINES
-
-#define  HAVE_IOSTREAM_WITHASSIGN_STREAMBUF
-#include "fcgio.h"
-#include "fcgi_config.h" 
-
-#endif /* _RAFALE_FCGI_H_ */
+std::map<std::string, Rafale::Session*>    Rafale::Session::sessionMap_;
+std::map<time_t, Rafale::Session>          Rafale::Session::sessions_;
+std::mutex                                 Rafale::Session::mutex_;

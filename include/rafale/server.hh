@@ -35,16 +35,13 @@
 #include <map>
 #include <cstdint>
 #include <rafale.h>
+#include <thread>
+#include <mutex>
 
 #include <rafale/fcgi.hh>
 
 namespace Rafale
 {
-  extern std::map<std::string, Rafale::File>      files;
-  extern std::map<std::string, std::string>       headers;
-  extern std::map<std::string, Rafale::Cookie>    cookies;
-
-
   class Server
   {
   public:
@@ -79,11 +76,14 @@ namespace Rafale
 
     static void        Clean_(int);
 
+    std::vector<std::thread>  threads_;
+
+    void WorkingLoop_(std::mutex &mutex);
   public:
     Server();
+    static size_t nbOfThreads;
 
     void        Run();
-
 
     ~Server()
     {
