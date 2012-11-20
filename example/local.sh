@@ -1,5 +1,6 @@
 #!/bin/sh
 
+rm /var/log/rafale/*
 env RAFALE_BUILD_TYPE=LOCAL cmake ..
 env RAFALE_BUILD_TYPE=LOCAL make
 kill -TERM `pgrep -f "./example-local"`

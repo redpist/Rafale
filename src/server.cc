@@ -63,7 +63,7 @@ std::string Rafale::BasicModel::password_ = Rafale::config["db.password"];
 
 std::shared_ptr<sql::Connection>    Rafale::BasicModel::con_;
 
-void LogSegfault(int )
+void LogSegfault(int)
 {
   Debug::Log("Segfault");
   exit(9);
@@ -112,9 +112,7 @@ void Rafale::Server::WorkingLoop_(std::mutex &mutex)
         break;
     }
     Rafale::Client client(request);
-    
     client.GetRafaleAnswer();
-
     FCGX_Finish_r(&request);
   }
 }
@@ -131,4 +129,5 @@ void    Rafale::Server::Run()
   }
   for (auto &thread: threads_)
     thread.join();
+  Debug::Log("End Of Rafale::Server::Run()", "log");
 }

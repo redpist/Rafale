@@ -1,6 +1,10 @@
 #!/usr/bin/zsh
 
 
+env RAFALE_BUILD_TYPE=LOCAL cmake .. || exit
+env RAFALE_BUILD_TYPE=LOCAL make || exit
+
+
 export CONTENT_LENGTH=""
 export CONTENT_TYPE=""
 export FCGI_ROLE="RESPONDER"
@@ -25,5 +29,4 @@ export SERVER_PORT="80"
 export SERVER_PROTOCOL="HTTP/1.1"
 export SERVER_SOFTWARE="nginx/1.0.5"
 
-make && valgrind ./example-local
-
+valgrind ./example-local

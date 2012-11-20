@@ -88,7 +88,7 @@ private:
 
     inline std::string ContentType_(Rafale::Controller *controller)
     {
-      return "Content-type: " + controller->ContentType() + "\r\n"; 
+      return "Content-type: " + controller->ContentType() + "\r\n";
     }
 
     inline const std::string &RafaleAnswer_()

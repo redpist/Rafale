@@ -41,6 +41,9 @@
 #include <curl/curl.h>
 #include <curl/easy.h>
 
+
+#define RAFALE_LOG(X) X;Debug::Log(#X, "log");
+
 namespace Debug
 {
   inline void Log(const std::string &str, const std::string &fileName = "error")

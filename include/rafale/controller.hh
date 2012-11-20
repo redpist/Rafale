@@ -37,6 +37,7 @@
 #include <dirent.h>
 #include <clocale>
 #include "rafale/fcgi.hh"
+#include "rafale/tools.hh"
 
 namespace Rafale
 {

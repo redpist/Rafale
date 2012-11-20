@@ -12,8 +12,9 @@ Rafale::Config Rafale::config = {
 
 int main()
 {
-  Rafale::Controller::Register<Default>("/");
-  Rafale::Controller::Register<Test>("/test");
+  std::string scope = "/rafale";
+  Rafale::Controller::Register<Default>(scope + "/");
+  Rafale::Controller::Register<Test>(scope + "/test");
   // Rafale::cookiesMaxAge = 3600 * 10;
 
   Rafale::Server server;
