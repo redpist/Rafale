@@ -44,8 +44,6 @@ namespace Rafale
 {
   class Server
   {
-  public:
-    static void     SetVariables(const std::string &rawData, std::map<std::string, std::string> &container);
   private:
     void    GetServerData();
     void     SetGetData(std::string &rawData, const std::map<std::string, std::string> &container);

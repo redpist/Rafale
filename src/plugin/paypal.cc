@@ -58,7 +58,7 @@ void  Paypal::GetToken(
   std::string res;
   Curl::Session session(url,
                         res);
-  Rafale::Server::SetVariables(res, data);
+  Rafale::ExplodeVariables(res, data);
 }
 
 void  Paypal::GetExpressCheckoutDetails(const std::string &token)
@@ -71,7 +71,7 @@ void  Paypal::GetExpressCheckoutDetails(const std::string &token)
   url += "&TOKEN=" + Rafale::UriEncode(token);
   std::string res;
   Curl::Session session(url, res);
-  Rafale::Server::SetVariables(res, data);
+  Rafale::ExplodeVariables(res, data);
 }
 
 void  Paypal::DoExpressCheckoutPayment(const std::string &token,
@@ -90,6 +90,6 @@ void  Paypal::DoExpressCheckoutPayment(const std::string &token,
   url += "&AMT=" + Rafale::ToString(amount);
   std::string res;
   Curl::Session session(url, res);
-  Rafale::Server::SetVariables(res, data);
+  Rafale::ExplodeVariables(res, data);
 }
 
