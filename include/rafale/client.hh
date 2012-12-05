@@ -36,6 +36,7 @@
 #include "rafale/environment.hh"
 
 #include <mutex>
+#include <sstream>
 
 namespace Rafale
 {
@@ -61,12 +62,12 @@ namespace Rafale
   public:
     Client(FCGX_Request &request) : request_(request)
     {
-      Environment::env_ = new Rafale::Environment();
-      GetRequestDatas_();
-      GetGetDatas_();
-      GetCookies_();
-      GetContent_();
-      GetPostDatas_();
+      RAFALE_LOG(Environment::env_ = new Rafale::Environment(););
+      RAFALE_LOG(GetRequestDatas_(););
+      RAFALE_LOG(GetGetDatas_(););
+      RAFALE_LOG(GetCookies_(););
+      RAFALE_LOG(GetContent_(););
+      RAFALE_LOG(GetPostDatas_(););
     }
 
     ~Client()
@@ -94,9 +95,8 @@ private:
     inline const std::string &RafaleAnswer_()
     {
       Dispatcher dispatcher(Rafale::Env().requestDatas["SCRIPT_FILENAME"]);
-
       Rafale::Controller    *p = Rafale::Controller::Make(dispatcher.String());
-      std::string data = p->Render();
+      std::string data = std::move(p->Render());
       answer_ = SerializeHeaders_();
       answer_ += SerializeCookies_();
       answer_ += ContentType_(p);
@@ -108,9 +108,9 @@ private:
 public:
     inline void GetRafaleAnswer()
     {
-      fcgi_streambuf  clientBuffer(request_.out);
-      std::ostream client(static_cast<std::streambuf *>(&clientBuffer));
-      client << RafaleAnswer_();
+      RAFALE_LOG(fcgi_streambuf  clientBuffer(request_.out););
+      RAFALE_LOG(std::ostream client(static_cast<std::streambuf *>(&clientBuffer)););
+      RAFALE_LOG(client << RafaleAnswer_(););
     }
 
 private:

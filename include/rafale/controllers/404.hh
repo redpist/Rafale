@@ -1,5 +1,5 @@
 //////////////////
-// Copyright (c) 2012, Jeremy Lecerf
+// Copyright (c) 2011, Jeremy Lecerf
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
 //     * Redistributions in binary form must reproduce the above copyright
 //       notice, this list of conditions and the following disclaimer in the
 //       documentation and/or other materials provided with the distribution.
-//     * Neither the name of Rafale nor the
+//     * Neither the name of R0x nor the
 //       names of its contributors may be used to endorse or promote products
 //       derived from this software without specific prior written permission.
 //
@@ -24,51 +24,30 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#ifndef _RAFALE_DISPATCHER_H_
-#define _RAFALE_DISPATCHER_H_
+#ifndef _RAFALE_CONTROLLER_404_H_
+#define _RAFALE_CONTROLLER_404_H_
 
-#include <string>
 #include <iostream>
-#include "rafale/controller.hh"
-#include <fstream>
+#include <rafale.h>
 
-class Dispatcher
+namespace Rafale
 {
-public:
-  Dispatcher(std::string url)
+  namespace DefaultControllers
   {
-    std::ofstream outputFile("/var/log/rafale/dispatcher.log"); // LOGS
-    if (outputFile.is_open()) // LOGS
+    class Error404 : public Rafale::Controller
+    {
+    protected:
+
+      void Print()
       {
-        outputFile << "Url: " << url << std::endl;
+        std::cout << "404" << std::endl;
       }
-    // {
-    //   std::size_t offset = url.find("http://");
-    //   if (offset == 0)
-    //     url = url.substr(sizeof("http://") - 1, url.size() - sizeof("http://") + 1);
-    // }
-    std::size_t startController = url.find("/");
-    if (startController == std::string::npos)
-      controller_ = "/";
-    else
-        controller_ = url.substr(startController);
-    if (!controller_.size())
-      controller_ = "/";
+
+      void Control()
+      {
+      }
+    };
   }
+}
 
-  const std::string &String()
-  {
-    return controller_;
-  }
-
-  ~Dispatcher()
-  {
-  }
-
-
-private:
-  std::string   error;
-  std::string   controller_;
-};
-
-#endif /* _RAFALE_DISPATCHER_H_ */
+#endif /* _RAFALE_CONTROLLER_404_H_ */

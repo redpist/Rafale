@@ -31,6 +31,7 @@
 #include <map>
 
 #include "rafale/depends.hh"
+#include <list>
 #include <string>
 #include <sstream>
 #include "rafale/dispatcher.hh"
@@ -78,6 +79,7 @@ namespace Rafale
   class Controller : public BasicController
   {
   public:
+
     virtual ~Controller() { };
 
     static const std::string &ContentType()
@@ -94,19 +96,54 @@ namespace Rafale
     template <class DependentController, template <class Controller> class Controller>
     friend struct Controllers::Depends;
 
+
     template    <typename ChildController>
     static Controller     *Make_()
     {
       return new ChildController();
     }
 
+  protected:
+
     static std::string contentType;
 
   public:
+    struct Scope
+    {
+      Scope(const std::string &str)
+      {
+        Controller::scopes_.push_back(str);
+      }
+
+      ~Scope()
+      {
+        Controller::scopes_.pop_back();
+      }
+    };
+
+    class Default
+    {
+      static std::function<Controller* (void)> error404_;
+    public:
+      template <typename Error404Controller>
+      static void SetError404()
+      {
+        error404_ = &Controller::Make_<Error404Controller>;
+      }
+      friend class Controller;
+    };
+
+
     template    <typename ChildController>
     static void        Register(const std::string &str)
     {
-      controllers_[str] = &Controller::Make_<ChildController>;
+      std::string route;
+      for (auto &scope: Controller::scopes_)
+        {
+          route += scope;
+        }
+      controllers_[route + str] = &Controller::Make_<ChildController>;
+      Debug::Log("Register : \"" + route + str + "\"", "log");
     }
 
     static inline Controller     *Make(const std::string &str)
@@ -122,9 +159,10 @@ namespace Rafale
       if (Controller::controllers_[str])
         return (Controller::controllers_[str])();
       else
-        throw("Controller Not Found.");
+        return Default::error404_();
     }
   private:
+    static std::list<std::string> scopes_;
     typedef std::map<std::string, std::function<Controller* (void)> > ControllersMap_;
     static ControllersMap_ controllers_;
   };

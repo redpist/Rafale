@@ -107,13 +107,13 @@ void Rafale::Server::WorkingLoop_(std::mutex &mutex)
   while (true)
   {
     {
-      std::lock_guard<std::mutex> lockGuard(mutex);
+      RAFALE_LOG(std::lock_guard<std::mutex> lockGuard(mutex););
       if (FCGX_Accept_r(&request) < 0)
         break;
     }
-    Rafale::Client client(request);
-    client.GetRafaleAnswer();
-    FCGX_Finish_r(&request);
+    RAFALE_LOG(Rafale::Client client(request););
+    RAFALE_LOG(client.GetRafaleAnswer(););
+    RAFALE_LOG(FCGX_Finish_r(&request););
   }
 }
 

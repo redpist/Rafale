@@ -24,7 +24,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //////////////////
 
-#include <memory> 
+#include <memory>
 #include "rafale/client.hh"
 #include "rafale/tools.hh"
 
