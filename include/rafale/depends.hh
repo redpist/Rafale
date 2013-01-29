@@ -35,10 +35,6 @@
 
 namespace Rafale
 {
-  class Controller;
-  class ContainerController;
-
-
   namespace Controllers
   {
     typedef std::function<void (void)> RendererType_;

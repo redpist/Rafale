@@ -49,7 +49,7 @@ namespace Rafale
     void     SetGetData(std::string &rawData, const std::map<std::string, std::string> &container);
     void    GetGetData();
     void    SetContent();
-    static std::string ContentType(Rafale::Controller *controller);
+    static std::string ContentType(Rafale::Controller_ *controller);
     std::string     &&ParseValue(const std::string &name, const std::string &str, std::size_t offset = 0, char assign = '=', char startDelim = '"', char endDelim = '"');
 
     inline bool            IsFileUpload(const std::string &part)

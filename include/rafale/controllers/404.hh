@@ -28,13 +28,13 @@
 #define _RAFALE_CONTROLLER_404_H_
 
 #include <iostream>
-#include <rafale.h>
+#include "rafale/controller.hh"
 
 namespace Rafale
 {
   namespace DefaultControllers
   {
-    class Error404 : public Rafale::Controller
+    class Error404 : public Rafale::Controller<Error404>
     {
     protected:
 

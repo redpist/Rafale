@@ -119,34 +119,44 @@ namespace Rafale
 
 
       // std::ofstream outputFile("/var/log/rafale/query.log"); // LOGS
+      Debug::Log("start", "query");
 
       host = Rafale::config["db.host"];
       if (!host.size())
         {
           //todo erreur no db.host section in config.cc
         }
+      Debug::Log("host", "query");
 
       user = Rafale::config["db.user"];
       if (!user.size())
         {
           //todo erreur no db.user section in config.cc
         }
+      Debug::Log("user", "query");
 
       std::string password = Rafale::config["db.password"];
       if (!password.size())
         {
           //todo erreur no db.password section in config.cc
         }
+      Debug::Log("password", "query");
 
       connection = std::unique_ptr<sql::Connection>(driver->connect(host, user, password));
+      Debug::Log("connection", "query");
+
       statement = std::unique_ptr<sql::Statement>(connection->createStatement());
+      Debug::Log("statement", "query");
 
       dataBase = Rafale::config["db.database"];
       if (!dataBase.size())
         {
           //todo erreur no db.database section in config.cc
         }
+      Debug::Log("database", "query");
+
       statement->execute("USE `" + dataBase + "`");
+      Debug::Log("use database", "query");
       std::string       sql;
       sql = "SELECT ";
       {
@@ -177,8 +187,13 @@ namespace Rafale
       //   {
       //     outputFile << "Query: " << sql << std::endl;
       //   }
+      Debug::Log("query : \"" + sql + "\"", "query");
       std::shared_ptr<std::list<CurrentModel>> result(new std::list<CurrentModel>());
+      Debug::Log("model shared ptr", "query");
+
       std::unique_ptr<sql::ResultSet>  res(statement->executeQuery(sql));
+      Debug::Log("executeQuery", "query");
+
       while (res->next())
         {
           CurrentModel model;
@@ -212,6 +227,7 @@ namespace Rafale
           }
           result->push_back(model);
         }
+      Debug::Log("result", "query");
       return result;
     }
 

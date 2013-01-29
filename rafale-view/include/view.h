@@ -54,7 +54,8 @@ namespace Rafale
       //   "{\n"
       //   "(void)(static_cast<Rafale::Controller*>(this));\n";
 
-
+      outputFile << "static std::list<std::string>      _rafale_scopes_;\n";
+      outputFile << "static std::string                 _rafale_name_;\n";
       outputFile <<  "void Print()\n"
         "{\n"
         "(void)(static_cast<Rafale::BasicController*>(this));\n";

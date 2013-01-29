@@ -39,6 +39,7 @@
 #include <clocale>
 #include "rafale/fcgi.hh"
 #include "rafale/tools.hh"
+#include "rafale/controller_static_members_policy.hh"
 
 namespace Rafale
 {
@@ -62,7 +63,6 @@ namespace Rafale
       Print();
     }
 
-
   public:
     inline std::string        Render() {
       std::stringstream _outputBuffer_;
@@ -76,19 +76,22 @@ namespace Rafale
     }
   };
 
-  class Controller : public BasicController
+  class Controller_ : public BasicController
   {
   public:
 
-    virtual ~Controller() { };
+    virtual ~Controller_() { };
 
     static const std::string &ContentType()
     {
       return contentType;
     }
 
+  public:
+
   protected:
-    Controller()
+
+    Controller_()
     {
       render_ = [this] (void) -> void { this->Render_(); };
     }
@@ -96,57 +99,38 @@ namespace Rafale
     template <class DependentController, template <class Controller> class Controller>
     friend struct Controllers::Depends;
 
-
+  private:
     template    <typename ChildController>
-    static Controller     *Make_()
+    static Controller_     *Make_(const std::list<std::string> &scopes, const std::string &name)
     {
+      Rafale::Policy::ControllerStaticMembers<ChildController>::SetScopes_(scopes);
+      Rafale::Policy::ControllerStaticMembers<ChildController>::SetName_(name);
       return new ChildController();
     }
-
-  protected:
 
     static std::string contentType;
 
   public:
-    struct Scope
-    {
-      Scope(const std::string &str)
-      {
-        Controller::scopes_.push_back(str);
-      }
-
-      ~Scope()
-      {
-        Controller::scopes_.pop_back();
-      }
-    };
 
     class Default
     {
-      static std::function<Controller* (void)> error404_;
+      static std::function<Controller_* (void)> error404_;
     public:
+      template <typename Error404Controller>
+      static std::function<Controller_* (void)> Maker404()
+      {
+        return []() {return Controller_::Make_<Error404Controller>({}, "404");};
+      }
+
       template <typename Error404Controller>
       static void SetError404()
       {
-        error404_ = &Controller::Make_<Error404Controller>;
+        error404_ = Maker404<Error404Controller>();
       }
-      friend class Controller;
+      friend class Controller_;
     };
 
-
-    template    <typename ChildController>
-    static void        Register(const std::string &str)
-    {
-      std::string route;
-      for (auto &scope: Controller::scopes_)
-        {
-          route += scope;
-        }
-      controllers_[route + str] = &Controller::Make_<ChildController>;
-      Debug::Log("Register : \"" + route + str + "\"", "log");
-    }
-
-    static inline Controller     *Make(const std::string &str)
+    static inline Controller_     *Make(const std::string &str)
     {
       std::fstream  log;
       log.open("/var/log/rafale/make.log", std::fstream::out);
@@ -156,15 +140,19 @@ namespace Rafale
           log.close();
         }
 
-      if (Controller::controllers_[str])
-        return (Controller::controllers_[str])();
+      if (Controller_::controllers_[str])
+        return (Controller_::controllers_[str])();
       else
         return Default::error404_();
     }
   private:
-    static std::list<std::string> scopes_;
-    typedef std::map<std::string, std::function<Controller* (void)> > ControllersMap_;
+    static std::list<std::string> RAIIscopes_;
+    typedef std::map<std::string, std::function<Controller_* (void)> > ControllersMap_;
     static ControllersMap_ controllers_;
+    template    <typename ChildController>
+    friend void        Register(const std::string &str);
+
+    friend struct Scope;
   };
 
   class ContainerController : public BasicController
@@ -179,6 +167,35 @@ namespace Rafale
     friend struct Controllers::Depends;
   };
 
-}
+  template <class T>
+  class Controller : public Controller_, public Rafale::Policy::ControllerStaticMembers<T>
+  {
+  };
 
+  struct Scope
+  {
+    Scope(const std::string &str)
+    {
+      Controller_::RAIIscopes_.push_back(str);
+    }
+
+    ~Scope()
+    {
+      Controller_::RAIIscopes_.pop_back();
+    }
+  };
+
+  template    <typename ChildController>
+  static void        Register(const std::string &str)
+  {
+    std::string route;
+    for (auto &scope: Controller_::RAIIscopes_)
+      {
+        route += scope;
+      }
+    Controller_::controllers_[route + str] = [=]() { return Controller_::Make_<ChildController>(Controller_::RAIIscopes_, str); };
+    Debug::Log("Register : \"" + route + str + "\"", "log");
+  }
+
+}
 #endif /* _RAFALE_CONTROLLER_H_ */

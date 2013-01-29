@@ -87,7 +87,7 @@ private:
       return (part.find("filename") < part.find("\r\n\r\n"));
     }
 
-    inline std::string ContentType_(Rafale::Controller *controller)
+    inline std::string ContentType_(Rafale::Controller_ *controller)
     {
       return "Content-type: " + controller->ContentType() + "\r\n";
     }
@@ -95,7 +95,7 @@ private:
     inline const std::string &RafaleAnswer_()
     {
       Dispatcher dispatcher(Rafale::Env().requestDatas["SCRIPT_FILENAME"]);
-      Rafale::Controller    *p = Rafale::Controller::Make(dispatcher.String());
+      Rafale::Controller_    *p = Rafale::Controller_::Make(dispatcher.String());
       std::string data = std::move(p->Render());
       answer_ = SerializeHeaders_();
       answer_ += SerializeCookies_();
